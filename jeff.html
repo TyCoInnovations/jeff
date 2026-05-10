@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Idle Gacha — TyCo Games Offline</title>
+<style>
+  :root{
+    --bg-1:#071029;
+    --bg-2:#071a2b;
+    --panel:#071827;
+    --muted:#9fb0c8;
+    --accent:#2dd4bf;
+    --accent-2:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+    --card-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    --glass-border: rgba(255,255,255,0.04);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
+    color:#e6eef6;
+    padding:20px;
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+    min-height:100vh;
+  }
+
+  /* Layout */
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border:1px solid var(--glass-border); padding:18px; border-radius:12px; box-shadow:var(--card-shadow)}
+  .left{flex:1 1 640px; min-width:360px}
+  .right{width:420px; min-width:320px}
+
+  h1{margin:0;font-size:20px;letter-spacing:0.2px}
+  .stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
+  .big{font-size:30px;font-weight:800;letter-spacing:0.5px}
+  .small{font-size:12px;color:var(--muted)}
+  .muted{color:var(--muted)}
+
+  /* Buttons */
+  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#002428;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(3,10,14,0.45)}
+  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px}
+  .btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.04);color:var(--muted)}
+
+  /* Roll area */
+  .roll-area{display:flex;gap:14px;align-items:center}
+  .result{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);min-width:240px;border:1px solid rgba(255,255,255,0.02)}
+  .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;margin-top:8px}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,#2dd4bf,#06b6d4);width:0%;transition:width 0.1s linear}
+
+  /* Inventory & log */
+  .inventory{max-height:260px;overflow:auto;margin-top:10px;border-radius:8px;padding:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+  .item{display:flex;justify-content:space-between;padding:8px;border-radius:8px;margin-bottom:6px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent)}
+  .shop-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
+
+  .rarity-tag{padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+  .r-common{background:#334155;color:#cbd5e1}
+  .r-uncommon{background:#14532d;color:#bbf7d0}
+  .r-rare{background:#1e3a8a;color:#bfdbfe}
+  .r-epic{background:#6b21a8;color:#f3e8ff}
+  .r-mythic{background:#b45309;color:#fff7ed}
+  .r-secret{background:#0f1724;color:#fef3c7;border:1px solid #fef3c7}
+  .r-unknown{background:#111827;color:#fce7f3;border:1px solid #fce7f3}
+
+  /* Save/controls */
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+  /* Money rain visuals */
+  .money-fall {
+    position:fixed;
+    pointer-events:none;
+    left:0; top:0; width:100%; height:100%; overflow:hidden; z-index:999;
+  }
+  .money {
+    position:absolute;
+    font-weight:900;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    transform: translateY(-10vh) rotate(-10deg);
+    opacity:0;
+    will-change: transform, opacity;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-10vh) scale(0.9) rotate(-10deg); opacity:0 }
+    10% { opacity:1 }
+    100% { transform: translateY(110vh) scale(1.05) rotate(10deg); opacity:0.95 }
+  }
+
+  /* subtle UI polish */
+  .header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .card-title{font-weight:800}
+  .muted-block{color:var(--muted);font-size:13px}
+  .pill{background:var(--glass);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.02);font-weight:700}
+  .center{display:flex;align-items:center;justify-content:center}
+  .download-note{font-size:12px;color:var(--muted);margin-top:8px}
+  .balance-change{font-weight:800;color:#bfffe8}
+</style>
+</head>
+<body>
+  <div class="money-fall" id="moneyFall"></div>
+
+  <div class="left panel">
+    <div class="header-row">
+      <div>
+        <h1 class="card-title">Idle Gacha</h1>
+        <div class="muted-block">Manual roll with optional automation</div>
+      </div>
+      <div class="pill">v1.2</div>
+    </div>
+
+    <div class="stat"><div><strong>Money</strong></div><div class="big" id="money">$0</div></div>
+    <div class="stat">
+      <div>
+        <strong>Income</strong>
+        <div class="small">base + boosters + items</div>
+      </div>
+      <div id="income">$1 / sec</div>
+    </div>
+    <div class="stat"><div><strong>Luck</strong></div><div id="luck" class="small">0%</div></div>
+
+    <div style="margin-top:14px" class="roll-area">
+      <div style="flex:1">
+        <button id="manualRollBtn" class="btn" style="font-size:18px;padding:14px 20px">ROLL!</button>
+        <div class="meta" style="margin-top:8px">Each roll costs <strong>$5</strong> and takes <strong id="rollDurationLabel">4.0s</strong></div>
+        <div class="progress" title="Roll progress"><i id="rollProgress"></i></div>
+      </div>
+
+      <div class="result" id="lastResult">
+        <div class="small">Last roll</div>
+        <div id="lastName" style="font-weight:900;font-size:16px">—</div>
+        <div id="lastRarity" class="small">—</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px">
+      <strong>Inventory</strong>
+      <div class="small" id="inventoryIncome">Item income: $0 / sec</div>
+      <div class="inventory" id="inventory"></div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <div class="right panel">
+    <h1 class="card-title">Shop & Automation</h1>
+
+    <div style="margin-top:12px">
+      <div class="shop-item">
+        <div>
+          <div><strong>Income Booster</strong></div>
+          <div class="small">+ $1 / sec</div>
+        </div>
+        <div>
+          <div>$50</div>
+          <button class="btn secondary" onclick="buyUpgrade('income')">Buy</button>
+        </div>
+      </div>
+
+      <div class="shop-item">
+        <div>
+          <div><strong>Sell Multiplier</strong></div>
+          <div class="small">+10% sell</div>
+        </div>
+        <div>
+          <div>$200</div>
+          <button class="btn secondary" onclick="buyUpgrade('sell')">Buy</button>
+        </div>
+      </div>
+
+      <div class="shop-item">
+        <div>
+          <div><strong>Auto-Seller</strong></div>
+          <div class="small">Auto-sell Commons</div>
+        </div>
+        <div>
+          <div>$300</div>
+          <button class="btn secondary" onclick="buyUpgrade('autosell')">Buy</button>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
+
+      <div><strong>Auto-Clickers</strong></div>
+      <div class="small">Auto-Clickers perform rolls automatically; each pays its own roll cost.</div>
+
+      <div class="shop-item">
+        <div>
+          <div><strong>Buy Auto-Clicker</strong></div>
+          <div class="small">Starts its own roll cycle</div>
+        </div>
+        <div>
+          <div id="autoClickerPrice">$500</div>
+          <button class="btn" onclick="buyAutoClicker()">Buy</button>
+        </div>
+      </div>
+
+      <div class="shop-item">
+        <div>
+          <div><strong>Roll Speed Upgrade</strong></div>
+          <div class="small">-0.5s per purchase (min 0.5s)</div>
+        </div>
+        <div>
+          <div id="speedUpgradePrice">$150</div>
+          <button class="btn secondary" onclick="buySpeedUpgrade()">Buy</button>
+        </div>
+      </div>
+
+      <div class="meta" style="margin-top:8px">Auto-Clickers: <strong id="autoClickerCount">0</strong> • Roll duration: <strong id="rollDurationDisplay">4.0s</strong></div>
+
+      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
+
+      <div><strong>Consumables & Eggs</strong></div>
+      <div class="shop-item">
+        <div>
+          <div><strong>Luck Potion (30s)</strong></div>
+          <div class="small">+30% luck</div>
+        </div>
+        <div>
+          <div>$75</div>
+          <button class="btn secondary" onclick="buyPotion()">Buy</button>
+        </div>
+      </div>
+
+      <div class="shop-item">
+        <div>
+          <div><strong>Epic Egg</strong></div>
+          <div class="small">Guaranteed Epic</div>
+        </div>
+        <div>
+          <div>$2000</div>
+          <button class="btn secondary" onclick="buyEgg('Epic')">Buy</button>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
+
+      <div class="controls">
+        <button class="btn secondary" onclick="exportSave()">Export Save</button>
+        <label class="btn secondary" style="cursor:pointer;padding:8px;border-radius:10px">
+          Import Save
+          <input id="fileImport" class="file-input" type="file" accept=".json" onchange="importSave(event)" style="display:none">
+        </label>
+        <button class="btn ghost" onclick="clearAllData()">Clear All & Close</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn secondary" onclick="simulateBugTest()">Run Bug Test (10k)</button>
+        <button class="btn secondary" onclick="simulateBugTest(1000)">Run Bug Test (1k)</button>
+      </div>
+
+      <div class="download-note muted" style="margin-top:10px">Export creates a JSON save file you can share.</div>
+    </div>
+  </div>
+
+<script>
+/* ---------- Game state ---------- */
+const GAME = {
+  money: 100,
+  baseIncome: 1,
+  incomeBoosts: 0,
+  sellMultiplier: 1.0,
+  autoSell: false,
+  luckPercent: 0,
+  inventory: {},
+  rollCost: 5,
+  autoClickers: 0,
+  autoClickerBasePrice: 500,
+  autoClickerPriceMultiplier: 1.6,
+  rollDuration: 4.0,
+  speedUpgradeLevel: 0,
+  speedUpgradeBasePrice: 150,
+  speedUpgradeDelta: 0.5,
+  speedUpgradeMinDuration: 0.5,
+  autoClickerTimers: [],
+  lastBugCSV: null
+};
+
+const RARITIES = [
+  {key:'Common', weight:50, color:'r-common', sell:5, itemPrefix:'Iron', income:0.10},
+  {key:'Uncommon', weight:25, color:'r-uncommon', sell:20, itemPrefix:'Bronze', income:0.50},
+  {key:'Rare', weight:12, color:'r-rare', sell:100, itemPrefix:'Silver', income:2},
+  {key:'Epic', weight:8, color:'r-epic', sell:500, itemPrefix:'Gold', income:10},
+  {key:'Mythic', weight:3, color:'r-mythic', sell:2000, itemPrefix:'Platinum', income:50},
+  {key:'Secret', weight:1, color:'r-secret', sell:10000, itemPrefix:'Obsidian', income:200},
+  {key:'???', weight:1, color:'r-unknown', sell:50000, itemPrefix:'Aetheric Core', income:1000}
+];
+
+/* ---------- UI refs ---------- */
+const UI = {
+  money: document.getElementById('money'),
+  income: document.getElementById('income'),
+  luck: document.getElementById('luck'),
+  inventory: document.getElementById('inventory'),
+  inventoryIncome: document.getElementById('inventoryIncome'),
+  lastName: document.getElementById('lastName'),
+  lastRarity: document.getElementById('lastRarity'),
+  log: document.getElementById('log'),
+  manualRollBtn: document.getElementById('manualRollBtn'),
+  rollProgress: document.getElementById('rollProgress'),
+  rollDurationLabel: document.getElementById('rollDurationLabel'),
+  rollDurationDisplay: document.getElementById('rollDurationDisplay'),
+  autoClickerCount: document.getElementById('autoClickerCount'),
+  autoClickerPrice: document.getElementById('autoClickerPrice'),
+  speedUpgradePrice: document.getElementById('speedUpgradePrice'),
+  fileImport: document.getElementById('fileImport'),
+  moneyFall: document.getElementById('moneyFall')
+};
+
+/* ---------- Helpers ---------- */
+function formatMoney(n){ return '$' + Math.floor(n).toLocaleString(); }
+function calculateItemIncome(){
+  let total = 0;
+  for(const r of RARITIES){
+    const count = GAME.inventory[r.key] || 0;
+    total += count * (r.income || 0);
+  }
+  return total;
+}
+function log(msg){
+  const line = document.createElement('div');
+  line.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
+  UI.log.prepend(line);
+  while(UI.log.children.length>300) UI.log.removeChild(UI.log.lastChild);
+}
+
+/* ---------- Visual money rain ---------- */
+function spawnMoneyRain(amount){
+  // amount: numeric dollars gained; spawn count proportional to amount
+  // cap count to avoid overload
+  const count = Math.min(40, Math.max(2, Math.round(amount / 10)));
+  const container = UI.moneyFall;
+  for(let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.className = 'money';
+    // choose symbol and style
+    el.textContent = '$';
+    const size = 12 + Math.random()*28; // px
+    el.style.fontSize = size + 'px';
+    el.style.left = (5 + Math.random()*90) + '%';
+    el.style.top = (-10 - Math.random()*10) + 'vh';
+    const delay = Math.random()*0.2;
+    const duration = 1.2 + Math.random()*1.6; // seconds
+    el.style.animationDuration = duration + 's';
+    el.style.animationDelay = delay + 's';
+    el.style.opacity = 0;
+    // slight horizontal drift using transform on animation end
+    el.style.transform = `translateY(-10vh) rotate(${(-20 + Math.random()*40)}deg)`;
+    container.appendChild(el);
+    // remove after animation
+    setTimeout(()=> {
+      el.remove();
+    }, (delay + duration + 0.2) * 1000);
+  }
+}
+
+/* ---------- Rarity roll ---------- */
+function weightedRarityRoll(luckPercent=0){
+  const weights = RARITIES.map(r => r.weight);
+  if(luckPercent>0){
+    const bonusTotal = (luckPercent/100) * 10;
+    for(let i=1;i<RARITIES.length;i++){
+      const factor = (i) / (RARITIES.length-1);
+      weights[i] += bonusTotal * factor;
+      weights[0] = Math.max(1, weights[0] - (bonusTotal * 0.2));
+    }
+  }
+  const sum = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random()*sum;
+  for(let i=0;i<weights.length;i++){
+    if(r < weights[i]) return RARITIES[i];
+    r -= weights[i];
+  }
+  return RARITIES[0];
+}
+
+/* ---------- Roll system (duration + auto-clickers) ---------- */
+let manualRollState = {busy:false, remaining:0, interval:null};
+
+function startRoll(source='manual', autoIndex=null){
+  if(manualRollState.busy && source==='manual') return false;
+  if(source==='auto' && autoIndex!=null){
+    if(GAME.autoClickerTimers[autoIndex].busy) return false;
+  }
+  if(GAME.money < GAME.rollCost) return false;
+  GAME.money -= GAME.rollCost;
+  updateUI();
+
+  const duration = Math.max(GAME.rollDuration, GAME.speedUpgradeMinDuration);
+  const start = Date.now();
+  const end = start + duration*1000;
+
+  if(source==='manual'){
+    manualRollState.busy = true;
+    manualRollState.remaining = duration;
+    UI.manualRollBtn.disabled = true;
+    UI.manualRollBtn.textContent = 'Rolling...';
+    manualRollState.interval = setInterval(()=>{
+      const now = Date.now();
+      const rem = Math.max(0, (end - now)/1000);
+      manualRollState.remaining = rem;
+      const pct = ((duration - rem)/duration)*100;
+      UI.rollProgress.style.width = `${Math.min(100,pct)}%`;
+      if(rem <= 0){
+        clearInterval(manualRollState.interval);
+        manualRollState.busy = false;
+        UI.manualRollBtn.disabled = false;
+        UI.manualRollBtn.textContent = 'ROLL!';
+        UI.rollProgress.style.width = `0%`;
+        completeRoll('manual');
+      }
+    }, 80);
+  } else if(source==='auto' && autoIndex!=null){
+    GAME.autoClickerTimers[autoIndex].busy = true;
+    GAME.autoClickerTimers[autoIndex].remaining = duration;
+    GAME.autoClickerTimers[autoIndex].end = end;
+  }
+  return true;
+}
+
+function completeRoll(source='manual', autoIndex=null){
+  const rarity = weightedRarityRoll(GAME.luckPercent);
+  const name = `${rarity.itemPrefix} ${rarity.key}`;
+  GAME.inventory[rarity.key] = (GAME.inventory[rarity.key]||0) + 1;
+  UI.lastName.textContent = name;
+  UI.lastRarity.textContent = rarity.key;
+  UI.lastRarity.className = 'small ' + rarity.color;
+  log(`Rolled: ${name} (${source === 'auto' ? 'Auto' : 'Manual'})`);
+  // small visual to show item obtained (spawn a few $ to celebrate)
+  spawnMoneyRain(Math.max(5, Math.min(200, rarity.sell/5)));
+  updateUI();
+}
+
+/* Auto-clicker tick */
+function autoClickerTick(){
+  for(let i=0;i<GAME.autoClickers;i++){
+    const t = GAME.autoClickerTimers[i];
+    if(!t) continue;
+    if(t.busy){
+      const now = Date.now();
+      const rem = Math.max(0, (t.end - now)/1000);
+      t.remaining = rem;
+      if(rem <= 0){
+        t.busy = false;
+        t.remaining = 0;
+        completeRoll('auto', i);
+      }
+    } else {
+      if(GAME.money >= GAME.rollCost){
+        startRoll('auto', i);
+      }
+    }
+  }
+}
+
+/* ---------- Selling & spawn visuals ---------- */
+function sellOne(rarityKey){
+  const r = RARITIES.find(x=>x.key===rarityKey);
+  if(!r || (GAME.inventory[rarityKey]||0) <= 0) return;
+  GAME.inventory[rarityKey]--;
+  const gain = r.sell * GAME.sellMultiplier;
+  GAME.money += gain;
+  log(`Sold ${r.itemPrefix} ${r.key} for $${Math.floor(gain)}`);
+  spawnMoneyRain(gain);
+  updateUI();
+}
+
+function sellAll(){
+  let total = 0;
+  for(const r of RARITIES){
+    const count = GAME.inventory[r.key] || 0;
+    if(count>0){
+      total += count * r.sell * GAME.sellMultiplier;
+      GAME.inventory[r.key] = 0;
+    }
+  }
+  GAME.money += total;
+  log(`Sold all items for $${Math.floor(total)}`);
+  spawnMoneyRain(total);
+  updateUI();
+}
+
+/* ---------- Shop ---------- */
+function buyUpgrade(type){
+  if(type==='income'){
+    if(GAME.money < 50){ log('Not enough money for Income Booster'); return; }
+    GAME.money -= 50;
+    GAME.incomeBoosts += 1;
+    log('Bought Income Booster (+$1 base income/sec)');
+    spawnMoneyRain(20);
+  } else if(type==='sell'){
+    if(GAME.money < 200){ log('Not enough money for Sell Multiplier'); return; }
+    GAME.money -= 200;
+    GAME.sellMultiplier += 0.10;
+    log('Bought Sell Multiplier (+10%)');
+    spawnMoneyRain(40);
+  } else if(type==='autosell'){
+    if(GAME.money < 300){ log('Not enough money for Auto-Seller'); return; }
+    GAME.money -= 300;
+    GAME.autoSell = true;
+    log('Bought Auto-Seller (Commons will auto-sell every 10s)');
+    spawnMoneyRain(60);
+  }
+  updateUI();
+}
+
+/* Auto-clicker pricing and purchase */
+function getAutoClickerPrice(){
+  return GAME.autoClickerBasePrice * Math.pow(GAME.autoClickerPriceMultiplier, GAME.autoClickers);
+}
+function buyAutoClicker(){
+  const price = Math.ceil(getAutoClickerPrice());
+  if(GAME.money < price){ log('Not enough money for Auto-Clicker'); return; }
+  GAME.money -= price;
+  GAME.autoClickers += 1;
+  GAME.autoClickerTimers.push({busy:false, remaining:0, end:0});
+  log(`Bought Auto-Clicker #${GAME.autoClickers} for ${formatMoney(price)}.`);
+  spawnMoneyRain(30);
+  updateUI();
+}
+
+/* Speed upgrade */
+function getSpeedUpgradePrice(){ return GAME.speedUpgradeBasePrice * (1 + GAME.speedUpgradeLevel*0.6); }
+function buySpeedUpgrade(){
+  const price = Math.ceil(getSpeedUpgradePrice());
+  if(GAME.money < price){ log('Not enough money for Speed Upgrade'); return; }
+  if(GAME.rollDuration <= GAME.speedUpgradeMinDuration + 0.0001){ log('Roll duration already at minimum.'); return; }
+  GAME.money -= price;
+  GAME.speedUpgradeLevel += 1;
+  GAME.rollDuration = Math.max(GAME.speedUpgradeMinDuration, GAME.rollDuration - GAME.speedUpgradeDelta);
+  log(`Bought Roll Speed Upgrade. New roll duration: ${GAME.rollDuration.toFixed(1)}s`);
+  spawnMoneyRain(25);
+  updateUI();
+}
+
+/* Potions and eggs */
+function buyPotion(){
+  if(GAME.money < 75){ log('Not enough money for Luck Potion'); return; }
+  GAME.money -= 75;
+  GAME.luckPercent += 30;
+  log('Used Luck Potion: +30% luck for 30s');
+  spawnMoneyRain(15);
+  updateUI();
+  setTimeout(()=>{
+    GAME.luckPercent = Math.max(0, GAME.luckPercent - 30);
+    log('Luck Potion expired');
+    updateUI();
+  }, 30000);
+}
+
+function buyEgg(rarityName){
+  const r = RARITIES.find(x=>x.key===rarityName);
+  if(!r){ log('Invalid egg'); return; }
+  const priceMap = {Epic:2000, Mythic:12000, Secret:50000};
+  const price = priceMap[rarityName] || 99999;
+  if(GAME.money < price){ log('Not enough money for that egg'); return; }
+  GAME.money -= price;
+  GAME.inventory[rarityName] = (GAME.inventory[rarityName]||0) + 1;
+  log(`Bought ${rarityName} Egg and received ${r.itemPrefix} ${rarityName}`);
+  spawnMoneyRain(price/10);
+  updateUI();
+}
+
+/* ---------- Passive income tick ---------- */
+function passiveIncomeTick(){
+  const base = GAME.baseIncome + GAME.incomeBoosts;
+  const itemsIncome = calculateItemIncome();
+  const income = base + itemsIncome;
+  GAME.money += income;
+  // spawn visuals proportional to income (cap)
+  spawnMoneyRain(Math.max(2, Math.min(200, income)));
+  updateUI();
+}
+setInterval(passiveIncomeTick, 1000);
+
+/* Auto-clicker tick */
+setInterval(autoClickerTick, 180);
+
+/* ---------- Persistence (localStorage + cookie + export/import) ---------- */
+const SAVE_KEY = 'idleGachaSave_v_visual';
+const COOKIE_NAME = 'idleGachaSaveCookie_v_visual';
+
+function saveGame(){
+  const save = {
+    money: GAME.money,
+    baseIncome: GAME.baseIncome,
+    incomeBoosts: GAME.incomeBoosts,
+    sellMultiplier: GAME.sellMultiplier,
+    autoSell: GAME.autoSell,
+    luckPercent: GAME.luckPercent,
+    inventory: GAME.inventory,
+    autoClickers: GAME.autoClickers,
+    rollDuration: GAME.rollDuration,
+    speedUpgradeLevel: GAME.speedUpgradeLevel
+  };
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(save))}; path=/; max-age=${60*60*24*365}`;
+  }catch(e){ console.warn('Save failed', e); }
+}
+setInterval(saveGame, 5000);
+
+function loadGame(){
+  const s = localStorage.getItem(SAVE_KEY);
+  if(s){
+    try{
+      const save = JSON.parse(s);
+      GAME.money = save.money ?? GAME.money;
+      GAME.baseIncome = save.baseIncome ?? GAME.baseIncome;
+      GAME.incomeBoosts = save.incomeBoosts ?? GAME.incomeBoosts;
+      GAME.sellMultiplier = save.sellMultiplier ?? GAME.sellMultiplier;
+      GAME.autoSell = save.autoSell ?? GAME.autoSell;
+      GAME.luckPercent = save.luckPercent ?? GAME.luckPercent;
+      GAME.inventory = save.inventory ?? GAME.inventory;
+      GAME.autoClickers = save.autoClickers ?? GAME.autoClickers;
+      GAME.rollDuration = save.rollDuration ?? GAME.rollDuration;
+      GAME.speedUpgradeLevel = save.speedUpgradeLevel ?? GAME.speedUpgradeLevel;
+      GAME.autoClickerTimers = [];
+      for(let i=0;i<GAME.autoClickers;i++) GAME.autoClickerTimers.push({busy:false, remaining:0, end:0});
+    }catch(e){ console.warn('Failed to parse save', e); }
+  } else {
+    const cookie = document.cookie.split('; ').find(c=>c.startsWith(COOKIE_NAME+'='));
+    if(cookie){
+      try{
+        const val = decodeURIComponent(cookie.split('=')[1]);
+        const save = JSON.parse(val);
+        GAME.money = save.money ?? GAME.money;
+        GAME.baseIncome = save.baseIncome ?? GAME.baseIncome;
+        GAME.incomeBoosts = save.incomeBoosts ?? GAME.incomeBoosts;
+        GAME.sellMultiplier = save.sellMultiplier ?? GAME.sellMultiplier;
+        GAME.autoSell = save.autoSell ?? GAME.autoSell;
+        GAME.luckPercent = save.luckPercent ?? GAME.luckPercent;
+        GAME.inventory = save.inventory ?? GAME.inventory;
+        GAME.autoClickers = save.autoClickers ?? GAME.autoClickers;
+        GAME.rollDuration = save.rollDuration ?? GAME.rollDuration;
+        GAME.speedUpgradeLevel = save.speedUpgradeLevel ?? GAME.speedUpgradeLevel;
+        GAME.autoClickerTimers = [];
+        for(let i=0;i<GAME.autoClickers;i++) GAME.autoClickerTimers.push({busy:false, remaining:0, end:0});
+      }catch(e){ console.warn('Failed to parse cookie save', e); }
+    }
+  }
+  updateUI();
+}
+loadGame();
+
+/* ---------- Export / Import / Clear ---------- */
+function exportSave(){
+  const save = localStorage.getItem(SAVE_KEY) || JSON.stringify({
+    money: GAME.money,
+    baseIncome: GAME.baseIncome,
+    incomeBoosts: GAME.incomeBoosts,
+    sellMultiplier: GAME.sellMultiplier,
+    autoSell: GAME.autoSell,
+    luckPercent: GAME.luckPercent,
+    inventory: GAME.inventory,
+    autoClickers: GAME.autoClickers,
+    rollDuration: GAME.rollDuration,
+    speedUpgradeLevel: GAME.speedUpgradeLevel
+  });
+  const blob = new Blob([save], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'idle_gacha_save.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  log('Exported save.');
+}
+
+function importSave(event){
+  const file = event.target.files && event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const data = JSON.parse(e.target.result);
+      if(typeof data !== 'object'){ throw new Error('Invalid save'); }
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+      document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(data))}; path=/; max-age=${60*60*24*365}`;
+      loadGame();
+      log('Imported save.');
+    }catch(err){
+      log('Failed to import save: invalid file.');
+      console.warn(err);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function clearAllData(){
+  if(!confirm('Clear all saved data and close the app?')) return;
+  try{
+    localStorage.removeItem(SAVE_KEY);
+    document.cookie = `${COOKIE_NAME}=; path=/; max-age=0`;
+    for(const k of Object.keys(localStorage)){
+      if(k.startsWith('idleGacha')) localStorage.removeItem(k);
+    }
+  }catch(e){ console.warn('Error clearing data', e); }
+  log('All local data cleared. Attempting to close window.');
+  setTimeout(()=>{ try{ window.close(); }catch(e){ console.warn('Close blocked', e); } }, 300);
+}
+
+/* ---------- Bug test ---------- */
+function simulateBugTest(trials = 10000){
+  const counts = {};
+  for(const r of RARITIES) counts[r.key] = 0;
+  for(let i=0;i<trials;i++){
+    const res = weightedRarityRoll(0);
+    counts[res.key]++;
+  }
+  console.log(`--- Bug Test: ${trials} rolls distribution ---`);
+  console.table(counts);
+  log(`Bug test complete: ${trials} rolls.`);
+  const rows = [['Rarity','Count','Percent','ExpectedPercent']];
+  const totalWeight = RARITIES.reduce((a,b)=>a+b.weight,0);
+  for(const r of RARITIES){
+    const expected = (r.weight / totalWeight) * 100;
+    const actual = (counts[r.key]/trials)*100;
+    rows.push([r.key, counts[r.key], actual.toFixed(4), expected.toFixed(4)]);
+    log(`${r.key}: expected ~${expected.toFixed(2)}% actual ${actual.toFixed(2)}%`);
+  }
+  const csv = rows.map(r => r.join(',')).join('\n');
+  GAME.lastBugCSV = csv;
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bugtest_${trials}_distribution.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  log('Bug test CSV downloaded.');
+  return {counts, csv};
+}
+
+/* ---------- UI update ---------- */
+function updateUI(){
+  UI.money.textContent = formatMoney(GAME.money);
+  const base = GAME.baseIncome + GAME.incomeBoosts;
+  const itemsIncome = calculateItemIncome();
+  const totalIncome = (base + itemsIncome).toFixed(2);
+  UI.income.textContent = `$${totalIncome} / sec`;
+  document.getElementById('inventoryIncome').textContent = `Item income: $${itemsIncome.toFixed(2)} / sec`;
+  UI.luck.textContent = `${GAME.luckPercent}%`;
+  UI.inventory.innerHTML = '';
+  for(const r of RARITIES){
+    const count = GAME.inventory[r.key] || 0;
+    if(count>0){
+      const perItem = r.income || 0;
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `<div><span class="rarity-tag ${r.color}">${r.key}</span> <strong style="margin-left:8px">${r.itemPrefix}</strong> <span class="small" style="margin-left:8px">(+${perItem}/s each)</span></div><div>${count} <button class="btn secondary" onclick="sellOne('${r.key}')">Sell</button></div>`;
+      UI.inventory.appendChild(div);
+    }
+  }
+  UI.autoClickerCount.textContent = GAME.autoClickers;
+  UI.autoClickerPrice.textContent = formatMoney(Math.ceil(getAutoClickerPrice()));
+  UI.speedUpgradePrice.textContent = formatMoney(getSpeedUpgradePrice());
+  UI.rollDurationLabel.textContent = `${GAME.rollDuration.toFixed(1)}s`;
+  UI.rollDurationDisplay.textContent = `${GAME.rollDuration.toFixed(1)}s`;
+}
+
+/* ---------- Bind events ---------- */
+UI.manualRollBtn.addEventListener('click', ()=>{
+  if(manualRollState.busy) { log('Manual roll already in progress.'); return; }
+  if(GAME.money < GAME.rollCost){ log('Not enough money to roll.'); return; }
+  startRoll('manual');
+});
+document.getElementById('fileImport').addEventListener('change', importSave);
+
+/* ---------- Start ---------- */
+updateUI();
+log('Game ready. Enjoy!');
+</script>
+</body>
+</html>
