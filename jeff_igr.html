@@ -87,7 +87,15 @@
 
   /* Inventory & log */
   .inventory{max-height:260px;overflow:auto;margin-top:10px;border-radius:8px;padding:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-  .item{display:flex;justify-content:space-between;padding:8px;border-radius:8px;margin-bottom:6px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);flex-wrap:wrap;gap:4px}
+  .rarity-group{margin-bottom:8px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);overflow:hidden}
+  .rarity-header{padding:10px;background:rgba(255,255,255,0.02);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:700;user-select:none;transition:background 0.2s}
+  .rarity-header:hover{background:rgba(255,255,255,0.04)}
+  .rarity-header.expanded{background:rgba(255,255,255,0.04)}
+  .rarity-toggle{font-size:10px;color:var(--muted)}
+  .rarity-items{display:none;padding:8px;border-top:1px solid rgba(255,255,255,0.02)}
+  .rarity-items.shown{display:block}
+  .item{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,0.01);font-size:12px;gap:4px}
+  .item:last-child{margin-bottom:0}
   .shop-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
 
   .rarity-tag{padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
@@ -160,6 +168,13 @@
   .theme-btn{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;transition:all 0.2s}
   .theme-btn.active{background:var(--accent);color:#002428;font-weight:700}
   
+  /* Slider styles */
+  .slider-container{display:flex;gap:8px;align-items:center;margin:8px 0}
+  .slider-container input[type="range"]{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.1);outline:none;-webkit-appearance:none;appearance:none}
+  .slider-container input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
+  .slider-container input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
+  .slider-label{font-size:12px;color:var(--muted);min-width:35px;text-align:right}
+  
   /* Log styles */
   .log{max-height:180px;overflow-y:auto;margin-top:8px;font-size:11px}
   .log-line{padding:4px;margin-bottom:2px;background:rgba(255,255,255,0.02);border-radius:4px}
@@ -174,7 +189,7 @@
         <h1 class="card-title">Idle Gacha</h1>
         <div class="muted-block">Manual roll with optional automation</div>
       </div>
-      <div class="pill">v2.0</div>
+      <div class="pill">v2.1</div>
     </div>
 
     <div id="speedrunPanel" style="display:none" class="speedrun-panel">
@@ -229,6 +244,15 @@
     <h1 class="card-title">Shop & Modes</h1>
 
     <div style="margin-top:12px">
+      <div><strong>Money Rain Intensity</strong></div>
+      <div class="small" style="margin-bottom:8px">Adjust visual intensity</div>
+      <div class="slider-container">
+        <input type="range" id="rainIntensitySlider" min="0" max="10" value="5" style="flex:1" onchange="updateRainIntensity()">
+        <span class="slider-label" id="rainIntensityLabel">5/10</span>
+      </div>
+
+      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
+
       <div><strong>Theme</strong></div>
       <div class="theme-selector">
         <button class="theme-btn active" onclick="setTheme('default')">Default</button>
@@ -421,7 +445,9 @@ const GAME = {
   autoClickerTimers: [],
   lastBugCSV: null,
   theme: 'default',
-  speedrun: {active:false, goal:0, startTime:0, startMoney:0}
+  speedrun: {active:false, goal:0, startTime:0, startMoney:0},
+  rainIntensity: 5,
+  expandedRarities: {}
 };
 
 const MATERIAL_VARIANTS = {
@@ -473,7 +499,9 @@ const UI = {
   speedrunPanel: document.getElementById('speedrunPanel'),
   speedrunTimer: document.getElementById('speedrunTimer'),
   speedrunGoal: document.getElementById('speedrunGoal'),
-  speedrunProgressBar: document.getElementById('speedrunProgressBar')
+  speedrunProgressBar: document.getElementById('speedrunProgressBar'),
+  rainIntensitySlider: document.getElementById('rainIntensitySlider'),
+  rainIntensityLabel: document.getElementById('rainIntensityLabel')
 };
 
 /* ---------- Helpers ---------- */
@@ -492,6 +520,23 @@ function log(msg){
   line.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
   UI.log.prepend(line);
   while(UI.log.children.length>300) UI.log.removeChild(UI.log.lastChild);
+}
+
+/* ---------- Rain Intensity ---------- */
+function updateRainIntensity(){
+  const val = parseInt(UI.rainIntensitySlider.value);
+  GAME.rainIntensity = val;
+  UI.rainIntensityLabel.textContent = `${val}/10`;
+  localStorage.setItem('idleGachaRainIntensity', val);
+}
+
+function loadRainIntensity(){
+  const saved = localStorage.getItem('idleGachaRainIntensity');
+  if(saved){
+    GAME.rainIntensity = parseInt(saved);
+    UI.rainIntensitySlider.value = saved;
+    UI.rainIntensityLabel.textContent = `${saved}/10`;
+  }
 }
 
 /* ---------- Speedrun Mode ---------- */
@@ -528,7 +573,6 @@ function finishSpeedrun(){
     const time = `${minutes}m ${seconds}s`;
     log(`🎉 SPEEDRUN COMPLETE in ${time}! Earned ${formatMoney(earned)}`);
     spawnMoneyRain(300);
-    // Show celebratory particles
     for(let i=0;i<20;i++){
       spawnParticle('✨', Math.random()*window.innerWidth, Math.random()*window.innerHeight);
     }
@@ -560,7 +604,6 @@ function setTheme(theme){
   GAME.theme = theme;
   document.body.className = theme === 'default' ? '' : `theme-${theme}`;
   localStorage.setItem('idleGachaTheme', theme);
-  // Update theme button active state
   document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
 }
@@ -573,7 +616,9 @@ function loadTheme(){
 
 /* ---------- Visual money rain ---------- */
 function spawnMoneyRain(amount){
-  const count = Math.min(40, Math.max(2, Math.round(amount / 10)));
+  if(GAME.rainIntensity === 0) return;
+  const intensityMultiplier = GAME.rainIntensity / 5;
+  const count = Math.min(40, Math.max(1, Math.round((amount / 10) * intensityMultiplier)));
   const container = UI.moneyFall;
   for(let i=0;i<count;i++){
     const el = document.createElement('div');
@@ -631,7 +676,7 @@ function weightedRarityRoll(luckPercent=0){
 function getVariantMaterial(rarity){
   const variants = MATERIAL_VARIANTS[rarity.key];
   const variant = variants[Math.floor(Math.random() * variants.length)];
-  const multiplier = 0.95 + Math.random() * 0.1; // 95-105% value
+  const multiplier = 0.95 + Math.random() * 0.1;
   return {variant, multiplier};
 }
 
@@ -694,7 +739,6 @@ function completeRoll(source='manual', autoIndex=null){
   log(`Rolled: ${name} (${source === 'auto' ? 'Auto' : 'Manual'}) ${multiplier > 1 ? '⭐' : ''}`);
   spawnMoneyRain(Math.max(5, Math.min(200, adjustedSell/5)));
   
-  // Particle effect for high value items
   if(multiplier > 1.02) spawnParticle('✨', Math.random()*window.innerWidth, 100);
   
   if(GAME.autoSell && rarity.key === 'Common'){
@@ -904,7 +948,8 @@ function saveGame(){
     autoClickers: GAME.autoClickers,
     rollDuration: GAME.rollDuration,
     speedUpgradeLevel: GAME.speedUpgradeLevel,
-    theme: GAME.theme
+    theme: GAME.theme,
+    rainIntensity: GAME.rainIntensity
   };
   try{
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
@@ -932,6 +977,7 @@ function loadGame(){
       GAME.rollDuration = save.rollDuration ?? GAME.rollDuration;
       GAME.speedUpgradeLevel = save.speedUpgradeLevel ?? GAME.speedUpgradeLevel;
       GAME.theme = save.theme ?? 'default';
+      GAME.rainIntensity = save.rainIntensity ?? 5;
       GAME.autoClickerTimers = [];
       for(let i=0;i<GAME.autoClickers;i++) GAME.autoClickerTimers.push({busy:false, remaining:0, end:0});
     }catch(e){ console.warn('Failed to parse save', e); }
@@ -954,7 +1000,8 @@ function exportSave(){
     autoClickers: GAME.autoClickers,
     rollDuration: GAME.rollDuration,
     speedUpgradeLevel: GAME.speedUpgradeLevel,
-    theme: GAME.theme
+    theme: GAME.theme,
+    rainIntensity: GAME.rainIntensity
   });
   const blob = new Blob([save], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -1002,48 +1049,10 @@ function clearAllData(){
   setTimeout(()=>{ location.reload(); }, 500);
 }
 
-/* ---------- Bug test at END ---------- */
-function runBugTestAtEnd(){
-  log('Running comprehensive bug test...');
-  const trials = 50000;
-  const counts = {};
-  for(const r of RARITIES) counts[r.key] = 0;
-  
-  for(let i=0;i<trials;i++){
-    const res = weightedRarityRoll(0);
-    counts[res.key]++;
-  }
-  
-  console.log(`=== BUG TEST RESULTS: ${trials} rolls ===`);
-  const rows = [['Rarity','Count','Actual %','Expected %','Variance']];
-  const totalWeight = RARITIES.reduce((a,b)=>a+b.weight,0);
-  let allGood = true;
-  
-  for(const r of RARITIES){
-    const expected = (r.weight / totalWeight) * 100;
-    const actual = (counts[r.key]/trials)*100;
-    const variance = Math.abs(actual - expected);
-    const status = variance < 1.5 ? '✓' : '✗';
-    rows.push([r.key, counts[r.key], actual.toFixed(3), expected.toFixed(3), variance.toFixed(3)]);
-    console.log(`${status} ${r.key}: ${actual.toFixed(2)}% (expected ${expected.toFixed(2)}%, variance ${variance.toFixed(2)}%)`);
-    if(variance >= 1.5) allGood = false;
-  }
-  
-  const csv = rows.map(r => r.join(',')).join('\n');
-  const status = allGood ? '✅ ALL TESTS PASSED' : '⚠️ VARIANCE DETECTED';
-  log(`Bug test complete: ${status}`);
-  console.table(counts);
-  
-  // Download CSV
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `bugtest_${trials}_final.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+/* ---------- Inventory collapsible UI ---------- */
+function toggleRarityGroup(rarityKey){
+  GAME.expandedRarities[rarityKey] = !GAME.expandedRarities[rarityKey];
+  updateUI();
 }
 
 /* ---------- UI update ---------- */
@@ -1085,17 +1094,55 @@ function updateUI(){
     UI.permItems.appendChild(div);
   }
   
+  // Build collapsible inventory by rarity
   UI.inventory.innerHTML = '';
   for(const r of RARITIES){
     const count = GAME.inventory[r.key] || 0;
-    if(count>0){
-      const perItem = r.income || 0;
-      const div = document.createElement('div');
-      div.className = 'item';
-      div.innerHTML = `<div style="flex:1"><span class="rarity-tag ${r.color}">${r.key}</span> <strong style="margin-left:8px">${r.itemPrefix}</strong> <span class="small" style="margin-left:8px">×${count} (+${perItem}/s)</span></div><div style="display:flex;gap:4px"><button class="btn secondary" onclick="sellOne('${r.key}')" style="padding:6px 8px;font-size:11px">Sell 1</button><button class="btn secondary" onclick="sellAllRarity('${r.key}')" style="padding:6px 8px;font-size:11px">All</button></div>`;
-      UI.inventory.appendChild(div);
+    if(count > 0){
+      const totalIncome = count * (r.income || 0);
+      const expanded = GAME.expandedRarities[r.key] || false;
+      
+      const group = document.createElement('div');
+      group.className = 'rarity-group';
+      
+      const header = document.createElement('div');
+      header.className = `rarity-header ${expanded ? 'expanded' : ''}`;
+      header.onclick = () => toggleRarityGroup(r.key);
+      header.innerHTML = `
+        <div>
+          <span class="rarity-tag ${r.color}">${r.key}</span>
+          <strong style="margin-left:8px">×${count}</strong>
+          <span class="small" style="margin-left:8px">${formatMoney(totalIncome)}/s</span>
+        </div>
+        <span class="rarity-toggle">${expanded ? '▼' : '▶'}</span>
+      `;
+      
+      const itemsContainer = document.createElement('div');
+      itemsContainer.className = `rarity-items ${expanded ? 'shown' : ''}`;
+      
+      if(expanded){
+        const variants = MATERIAL_VARIANTS[r.key];
+        const itemsHtml = `
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.02)">
+            <div><strong>${r.itemPrefix} variants</strong></div>
+            <div style="display:flex;gap:4px">
+              <button class="btn secondary" onclick="sellOne('${r.key}')" style="padding:4px 8px;font-size:10px">Sell 1</button>
+              <button class="btn secondary" onclick="sellAllRarity('${r.key}')" style="padding:4px 8px;font-size:10px">Sell All</button>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted)">
+            Base sell: <strong>${formatMoney(r.sell)}</strong> | Income: <strong>$${(r.income || 0).toFixed(2)}/s each</strong>
+          </div>
+        `;
+        itemsContainer.innerHTML = itemsHtml;
+      }
+      
+      group.appendChild(header);
+      group.appendChild(itemsContainer);
+      UI.inventory.appendChild(group);
     }
   }
+  
   UI.autoClickerCount.textContent = GAME.autoClickers;
   UI.autoClickerPrice.textContent = formatMoney(Math.ceil(getAutoClickerPrice()));
   UI.speedUpgradePrice.textContent = formatMoney(Math.ceil(getSpeedUpgradePrice()));
@@ -1113,12 +1160,33 @@ document.getElementById('fileImport').addEventListener('change', importSave);
 
 /* ---------- Start ---------- */
 loadTheme();
+loadRainIntensity();
 loadGame();
 updateUI();
 log('Game ready. Enjoy!');
 
-// Run bug test after 2 minutes of gameplay
-setTimeout(runBugTestAtEnd, 120000);
+setTimeout(() => {
+  log('Running final bug test (50,000 rolls)...');
+  const trials = 50000;
+  const counts = {};
+  for(const r of RARITIES) counts[r.key] = 0;
+  for(let i=0;i<trials;i++){
+    const res = weightedRarityRoll(0);
+    counts[res.key]++;
+  }
+  console.log(`=== BUG TEST: ${trials} rolls ===`);
+  console.table(counts);
+  const totalWeight = RARITIES.reduce((a,b)=>a+b.weight,0);
+  let allGood = true;
+  for(const r of RARITIES){
+    const expected = (r.weight/totalWeight)*100;
+    const actual = (counts[r.key]/trials)*100;
+    const variance = Math.abs(actual-expected);
+    console.log(`${r.key}: ${actual.toFixed(2)}% (expected ${expected.toFixed(2)}%, variance ${variance.toFixed(2)}%)`);
+    if(variance >= 1.5) allGood = false;
+  }
+  log(`✅ Bug test complete: ${allGood ? 'All distributions normal' : 'Some variance detected'}`);
+}, 120000);
 </script>
 </body>
 </html>
