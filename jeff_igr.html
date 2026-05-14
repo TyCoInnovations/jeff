@@ -5,179 +5,242 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Idle Gacha Roller — Project Jeff</title>
 <style>
-  :root{
-    --bg-1:#071029;
-    --bg-2:#071a2b;
-    --panel:#071827;
-    --muted:#9fb0c8;
-    --accent:#2dd4bf;
-    --accent-2:#06b6d4;
+  :root {
+    --bg-1: #071029;
+    --bg-2: #071a2b;
+    --muted: #9fb0c8;
+    --accent: #2dd4bf;
+    --accent-2: #06b6d4;
     --glass: rgba(255,255,255,0.03);
     --card-shadow: 0 8px 30px rgba(2,6,23,0.6);
     --glass-border: rgba(255,255,255,0.04);
   }
-  
-  body.theme-neon {
-    --bg-1:#0a0014;
-    --bg-2:#1a001f;
-    --accent:#ff006e;
-    --accent-2:#ff72b1;
-  }
-  
-  body.theme-ocean {
-    --bg-1:#001a33;
-    --bg-2:#002b5c;
-    --accent:#00d9ff;
-    --accent-2:#00b8e6;
-  }
-  
-  body.theme-forest {
-    --bg-1:#0d2818;
-    --bg-2:#1a4d2e;
-    --accent:#52b788;
-    --accent-2:#74c69d;
-  }
-  
-  body.theme-sunset {
-    --bg-1:#3d1f1f;
-    --bg-2:#5c2e2e;
-    --accent:#ff9a56;
-    --accent-2:#ffc75f;
-  }
+  body.theme-neon    { --bg-1:#0a0014; --bg-2:#1a001f; --accent:#ff006e; --accent-2:#ff72b1; }
+  body.theme-ocean   { --bg-1:#001a33; --bg-2:#002b5c; --accent:#00d9ff; --accent-2:#00b8e6; }
+  body.theme-forest  { --bg-1:#0d2818; --bg-2:#1a4d2e; --accent:#52b788; --accent-2:#74c69d; }
+  body.theme-sunset  { --bg-1:#3d1f1f; --bg-2:#5c2e2e; --accent:#ff9a56; --accent-2:#ffc75f; }
 
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
-    color:#e6eef6;
-    padding:20px;
-    display:flex;
-    gap:20px;
-    align-items:flex-start;
-    min-height:100vh;
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    color: #e6eef6;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    min-height: 100vh;
     transition: background 0.3s ease;
   }
 
-  /* Layout */
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border:1px solid var(--glass-border); padding:18px; border-radius:12px; box-shadow:var(--card-shadow)}
-  .left{flex:1 1 640px; min-width:360px; max-height:90vh; overflow-y:auto}
-  .right{width:420px; min-width:320px; max-height:90vh; overflow-y:auto}
+  .panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), transparent);
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+  }
+  .left  { flex: 1 1 640px; min-width: 360px; max-height: 90vh; overflow-y: auto; }
+  .right { width: 420px; min-width: 320px; max-height: 90vh; overflow-y: auto; }
 
-  h1{margin:0;font-size:20px;letter-spacing:0.2px}
-  h2{margin:8px 0;font-size:16px;letter-spacing:0.1px}
-  .stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
-  .big{font-size:30px;font-weight:800;letter-spacing:0.5px}
-  .small{font-size:12px;color:var(--muted)}
-  .muted{color:var(--muted)}
+  h1 { margin: 0; font-size: 20px; letter-spacing: 0.2px; }
+  .stat {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 0; border-bottom: 1px dashed rgba(255,255,255,0.03);
+  }
+  .big   { font-size: 32px; font-weight: 800; letter-spacing: 0.5px; color: #fff; }
+  .small { font-size: 12px; color: var(--muted); }
+  .muted { color: var(--muted); }
 
-  /* Buttons */
-  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#002428;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(3,10,14,0.3);transition:opacity 0.15s}
-  .btn:hover{opacity:0.9}
-  .btn:disabled{opacity:0.5;cursor:not-allowed}
-  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px}
-  .btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.04);color:var(--muted)}
+  .btn {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border: none; color: #002428; padding: 10px 14px; border-radius: 10px;
+    font-weight: 800; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:hover   { opacity: 0.9; transform: translateY(-1px); }
+  .btn:active  { transform: translateY(0); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  .btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--muted); padding: 8px 10px;
+    box-shadow: none;
+  }
+  .btn.secondary:hover { border-color: rgba(255,255,255,0.18); color: #e6eef6; }
+  .btn.ghost {
+    background: transparent;
+    border: 1px dashed rgba(255,255,255,0.05);
+    color: var(--muted); box-shadow: none;
+  }
+  .btn.ghost:hover { border-color: rgba(255,80,80,0.4); color: #fca5a5; }
 
-  /* Roll area */
-  .roll-area{display:flex;gap:14px;align-items:center}
-  .result{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);min-width:240px;border:1px solid rgba(255,255,255,0.02)}
-  .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;margin-top:8px}
-  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width 0.1s linear}
+  .roll-area { display: flex; gap: 14px; align-items: center; }
+  .result {
+    padding: 14px; border-radius: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    min-width: 200px; border: 1px solid rgba(255,255,255,0.04);
+    flex: 1;
+  }
+  .result-name  { font-weight: 900; font-size: 16px; margin: 4px 0 2px; min-height: 22px; }
+  .progress {
+    height: 8px; background: rgba(255,255,255,0.04);
+    border-radius: 8px; overflow: hidden; margin-top: 10px;
+  }
+  .progress > i {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    width: 0%; transition: width 0.08s linear;
+    border-radius: 8px;
+  }
 
-  /* Inventory & log */
-  .inventory{max-height:260px;overflow:auto;margin-top:10px;border-radius:8px;padding:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-  .rarity-group{margin-bottom:8px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);overflow:hidden}
-  .rarity-header{padding:10px;background:rgba(255,255,255,0.02);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:700;user-select:none;transition:background 0.2s}
-  .rarity-header:hover{background:rgba(255,255,255,0.04)}
-  .rarity-header.expanded{background:rgba(255,255,255,0.04)}
-  .rarity-toggle{font-size:10px;color:var(--muted)}
-  .rarity-items{display:none;padding:8px;border-top:1px solid rgba(255,255,255,0.02)}
-  .rarity-items.shown{display:block}
-  .item{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,0.01);font-size:12px;gap:4px}
-  .item:last-child{margin-bottom:0}
-  .shop-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--muted);
+    margin: 18px 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1;
+    height: 1px; background: rgba(255,255,255,0.04);
+  }
 
-  .rarity-tag{padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
-  .r-common{background:#334155;color:#cbd5e1}
-  .r-uncommon{background:#14532d;color:#bbf7d0}
-  .r-rare{background:#1e3a8a;color:#bfdbfe}
-  .r-epic{background:#6b21a8;color:#f3e8ff}
-  .r-mythic{background:#b45309;color:#fff7ed}
-  .r-secret{background:#0f1724;color:#fef3c7;border:1px solid #fef3c7}
-  .r-unknown{background:#111827;color:#fce7f3;border:1px solid #fce7f3}
+  .inventory {
+    max-height: 240px; overflow: auto; margin-top: 8px;
+    border-radius: 8px; padding: 6px;
+    background: rgba(255,255,255,0.01);
+    border: 1px solid rgba(255,255,255,0.02);
+  }
+  .rarity-group {
+    margin-bottom: 6px; border-radius: 8px;
+    background: rgba(255,255,255,0.01);
+    border: 1px solid rgba(255,255,255,0.03);
+    overflow: hidden;
+  }
+  .rarity-header {
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.02);
+    cursor: pointer; display: flex;
+    justify-content: space-between; align-items: center;
+    font-weight: 700; user-select: none;
+    transition: background 0.15s;
+  }
+  .rarity-header:hover    { background: rgba(255,255,255,0.04); }
+  .rarity-header.expanded { background: rgba(255,255,255,0.035); }
+  .rarity-toggle { font-size: 10px; color: var(--muted); }
+  .rarity-items  { display: none; padding: 10px; border-top: 1px solid rgba(255,255,255,0.03); }
+  .rarity-items.shown { display: block; }
 
-  /* Save/controls */
-  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .shop-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px dashed rgba(255,255,255,0.03);
+  }
+  .shop-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+  .shop-price { font-size: 13px; font-weight: 700; color: var(--accent); }
 
-  /* Money rain visuals */
+  .rarity-tag { padding: 5px 10px; border-radius: 999px; font-weight: 800; font-size: 11px; }
+  .r-common  { background: #334155; color: #cbd5e1; }
+  .r-uncommon{ background: #14532d; color: #bbf7d0; }
+  .r-rare    { background: #1e3a8a; color: #bfdbfe; }
+  .r-epic    { background: #6b21a8; color: #f3e8ff; }
+  .r-mythic  { background: #b45309; color: #fff7ed; }
+  .r-secret  { background: #0f1724; color: #fef3c7; border: 1px solid rgba(254,243,199,0.4); }
+  .r-unknown { background: #111827; color: #fce7f3; border: 1px solid rgba(252,231,243,0.4); }
+
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
   .money-fall {
-    position:fixed;
-    pointer-events:none;
-    left:0; top:0; width:100%; height:100%; overflow:hidden; z-index:999;
+    position: fixed; pointer-events: none;
+    left: 0; top: 0; width: 100%; height: 100%;
+    overflow: hidden; z-index: 999;
   }
   .money {
-    position:absolute;
-    font-weight:900;
-    color: #fff;
+    position: absolute; font-weight: 900; color: #fff;
     text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-    transform: translateY(-10vh) rotate(-10deg);
-    opacity:0;
-    will-change: transform, opacity;
+    opacity: 0; will-change: transform, opacity;
     animation: fall linear forwards;
   }
   @keyframes fall {
-    0% { transform: translateY(-10vh) scale(0.9) rotate(-10deg); opacity:0 }
-    10% { opacity:1 }
-    100% { transform: translateY(110vh) scale(1.05) rotate(10deg); opacity:0.95 }
-  }
-
-  /* Particle effects */
-  .particle {
-    position:absolute;
-    pointer-events:none;
-    font-size:20px;
+    0%   { transform: translateY(-10vh) scale(0.9) rotate(-10deg); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translateY(110vh) scale(1.05) rotate(10deg); opacity: 0.95; }
   }
   @keyframes rise {
-    0% { opacity:1; transform: translateY(0) scale(1); }
-    100% { opacity:0; transform: translateY(-60px) scale(0.8); }
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
   }
 
-  /* subtle UI polish */
-  .header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .card-title{font-weight:800}
-  .muted-block{color:var(--muted);font-size:13px}
-  .pill{background:var(--glass);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.02);font-weight:700}
-  .center{display:flex;align-items:center;justify-content:center}
-  .download-note{font-size:12px;color:var(--muted);margin-top:8px}
-  .balance-change{font-weight:800;color:#bfffe8}
-  
-  .perm-item-display{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-  .perm-item{padding:6px 10px;border-radius:8px;background:rgba(45,212,191,0.1);border:1px solid rgba(45,212,191,0.3);font-size:12px;font-weight:700;color:#a7f3d0}
-  
-  /* Speedrun Mode */
-  .speedrun-panel{background:linear-gradient(180deg, rgba(255,150,0,0.1), rgba(255,100,0,0.05));border:2px solid rgba(255,150,0,0.4);padding:16px;border-radius:12px;margin-bottom:12px}
-  .speedrun-timer{font-size:28px;font-weight:900;text-align:center;color:#ff9a56;font-family:monospace;margin:8px 0}
-  .speedrun-goal{font-size:12px;color:var(--muted);text-align:center}
-  .speedrun-progress{height:8px;background:rgba(255,255,255,0.02);border-radius:6px;margin:8px 0;overflow:hidden}
-  .speedrun-progress-bar{height:100%;background:linear-gradient(90deg,#ff9a56,#ffc75f);width:0%;transition:width 0.2s ease}
-  .speedrun-active{color:#ffc75f}
-  
-  /* Theme selector */
-  .theme-selector{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-  .theme-btn{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;transition:all 0.2s}
-  .theme-btn.active{background:var(--accent);color:#002428;font-weight:700}
-  
-  /* Slider styles */
-  .slider-container{display:flex;gap:8px;align-items:center;margin:8px 0}
-  .slider-container input[type="range"]{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.1);outline:none;-webkit-appearance:none;appearance:none}
-  .slider-container input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
-  .slider-container input[type="range"]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:none;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
-  .slider-label{font-size:12px;color:var(--muted);min-width:35px;text-align:right}
-  
-  /* Log styles */
-  .log{max-height:180px;overflow-y:auto;margin-top:8px;font-size:11px}
-  .log-line{padding:4px;margin-bottom:2px;background:rgba(255,255,255,0.02);border-radius:4px}
+  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .card-title { font-weight: 800; font-size: 20px; }
+  .muted-block { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .pill {
+    background: rgba(255,255,255,0.04); padding: 5px 11px;
+    border-radius: 999px; border: 1px solid rgba(255,255,255,0.06);
+    font-weight: 700; font-size: 12px; color: var(--muted);
+  }
+
+  .perm-item-display { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .perm-item {
+    padding: 5px 10px; border-radius: 8px;
+    background: rgba(45,212,191,0.08);
+    border: 1px solid rgba(45,212,191,0.25);
+    font-size: 12px; font-weight: 700; color: #a7f3d0;
+  }
+
+  .speedrun-panel {
+    background: linear-gradient(180deg, rgba(255,150,0,0.08), rgba(255,100,0,0.03));
+    border: 1px solid rgba(255,150,0,0.35);
+    padding: 16px; border-radius: 12px; margin-bottom: 14px;
+  }
+  .speedrun-timer { font-size: 32px; font-weight: 900; text-align: center; color: #ff9a56; font-family: monospace; margin: 6px 0; }
+  .speedrun-goal-lbl { font-size: 12px; color: var(--muted); text-align: center; }
+  .speedrun-progress { height: 6px; background: rgba(255,255,255,0.04); border-radius: 6px; margin: 8px 0; overflow: hidden; }
+  .speedrun-progress-bar { height: 100%; background: linear-gradient(90deg, #ff9a56, #ffc75f); width: 0%; transition: width 0.2s ease; }
+
+  .theme-selector { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .theme-btn {
+    padding: 5px 12px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: transparent; color: var(--muted);
+    cursor: pointer; font-size: 11px; transition: all 0.2s;
+  }
+  .theme-btn:hover  { border-color: rgba(255,255,255,0.2); color: #e6eef6; }
+  .theme-btn.active { background: var(--accent); color: #002428; font-weight: 700; border-color: transparent; }
+
+  .slider-container { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+  .slider-container input[type="range"] {
+    flex: 1; height: 5px; border-radius: 3px;
+    background: rgba(255,255,255,0.1);
+    outline: none; -webkit-appearance: none; appearance: none;
+  }
+  .slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .slider-container input[type="range"]::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .slider-label { font-size: 12px; color: var(--muted); min-width: 35px; text-align: right; }
+
+  .log { max-height: 160px; overflow-y: auto; margin-top: 8px; font-size: 11px; }
+  .log-line {
+    padding: 4px 6px; margin-bottom: 2px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 4px; color: var(--muted);
+    border-left: 2px solid transparent;
+  }
+  .log-line.log-good  { border-left-color: var(--accent); color: #e6eef6; }
+  .log-line.log-warn  { border-left-color: #f59e0b; }
+  .log-line.log-error { border-left-color: #f87171; }
+
+  hr.divider { border: none; border-top: 1px dashed rgba(255,255,255,0.04); margin: 14px 0; }
 </style>
 </head>
 <body>
@@ -186,242 +249,245 @@
   <div class="left panel">
     <div class="header-row">
       <div>
-        <h1 class="card-title">Idle Gacha</h1>
-        <div class="muted-block">Manual roll with optional automation</div>
+        <div class="card-title">Idle Gacha</div>
+        <div class="muted-block">Roll. Collect. Automate.</div>
       </div>
-      <div class="pill">v2.1</div>
+      <div class="pill">v2.3</div>
     </div>
 
     <div id="speedrunPanel" style="display:none" class="speedrun-panel">
-      <div style="font-weight:800;font-size:14px;margin-bottom:6px">⏱️ SPEEDRUN MODE</div>
+      <div style="font-weight:800;font-size:13px;margin-bottom:4px;letter-spacing:0.5px">⏱ SPEEDRUN MODE</div>
       <div class="speedrun-timer" id="speedrunTimer">00:00</div>
-      <div class="speedrun-goal" id="speedrunGoal">Goal: $100,000</div>
+      <div class="speedrun-goal-lbl" id="speedrunGoalDisplay">Goal: $100,000</div>
       <div class="speedrun-progress">
         <div class="speedrun-progress-bar" id="speedrunProgressBar"></div>
       </div>
-      <div style="display:flex;gap:6px;margin-top:8px">
+      <div style="display:flex;gap:6px;margin-top:10px">
         <button class="btn" onclick="finishSpeedrun()" style="flex:1;padding:8px">FINISH</button>
         <button class="btn ghost" onclick="cancelSpeedrun()" style="flex:1;padding:8px">CANCEL</button>
       </div>
     </div>
 
-    <div class="stat"><div><strong>Money</strong></div><div class="big" id="money">$0</div></div>
+    <div class="stat">
+      <div><strong>Money</strong></div>
+      <div><span class="big" id="money">$0</span></div>
+    </div>
     <div class="stat">
       <div>
         <strong>Income</strong>
         <div class="small">base + boosters + items</div>
       </div>
-      <div id="income">$1 / sec</div>
+      <div id="income" style="font-weight:700">$1.00 / sec</div>
     </div>
-    <div class="stat"><div><strong>Luck</strong></div><div id="luck" class="small">0%</div></div>
+    <div class="stat">
+      <div><strong>Luck</strong></div>
+      <div id="luckDisplay" style="font-weight:700">0%</div>
+    </div>
 
-    <div style="margin-top:14px" class="roll-area">
+    <div style="margin-top:16px" class="roll-area">
       <div style="flex:1">
-        <button id="manualRollBtn" class="btn" style="font-size:18px;padding:14px 20px">ROLL!</button>
-        <div class="meta" style="margin-top:8px">Each roll costs <strong>$5</strong> and takes <strong id="rollDurationLabel">4.0s</strong></div>
-        <div class="progress" title="Roll progress"><i id="rollProgress"></i></div>
+        <button id="manualRollBtn" class="btn" style="font-size:18px;padding:14px 22px;width:100%">ROLL!</button>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted)">
+          Costs <strong style="color:#e6eef6">$5</strong> · takes <strong id="rollDurationLabel" style="color:#e6eef6">4.0s</strong>
+        </div>
+        <div class="progress"><i id="rollProgress"></i></div>
       </div>
-
-      <div class="result" id="lastResult">
+      <div class="result">
         <div class="small">Last roll</div>
-        <div id="lastName" style="font-weight:900;font-size:16px">—</div>
+        <div class="result-name" id="lastName">—</div>
         <div id="lastRarity" class="small">—</div>
       </div>
     </div>
 
-    <div style="margin-top:16px">
-      <strong>Permanent Boosts</strong>
-      <div class="perm-item-display" id="permItems"></div>
-      
-      <strong style="margin-top:12px;display:block">Inventory</strong>
-      <div class="small" id="inventoryIncome">Item income: $0 / sec</div>
-      <div class="inventory" id="inventory"></div>
-      <div class="log" id="log"></div>
+    <div class="section-label">Permanent Boosts</div>
+    <div class="perm-item-display" id="permItems">
+      <span class="small" style="color:var(--muted);font-style:italic">None yet</span>
     </div>
+
+    <div class="section-label">Inventory</div>
+    <div class="small" id="inventoryIncome">Item income: $0.00 / sec</div>
+    <div class="inventory" id="inventory">
+      <div class="small" style="color:var(--muted);font-style:italic;padding:6px">No items yet — go roll!</div>
+    </div>
+
+    <div class="section-label">Log</div>
+    <div class="log" id="log"></div>
   </div>
 
   <div class="right panel">
-    <h1 class="card-title">Shop & Modes</h1>
+    <div class="card-title" style="margin-bottom:16px">Shop & Settings</div>
 
-    <div style="margin-top:12px">
-      <div><strong>Money Rain Intensity</strong></div>
-      <div class="small" style="margin-bottom:8px">Adjust visual intensity</div>
-      <div class="slider-container">
-        <input type="range" id="rainIntensitySlider" min="0" max="10" value="5" style="flex:1" onchange="updateRainIntensity()">
+    <div class="section-label">Visuals</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:13px;font-weight:600">Money Rain</div>
+        <div class="small">Visual intensity</div>
+      </div>
+      <div class="slider-container" style="width:160px;margin:0">
+        <input type="range" id="rainIntensitySlider" min="0" max="10" value="5" oninput="updateRainIntensity(this)">
         <span class="slider-label" id="rainIntensityLabel">5/10</span>
       </div>
-
-      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
-
-      <div><strong>Theme</strong></div>
-      <div class="theme-selector">
-        <button class="theme-btn active" onclick="setTheme('default')">Default</button>
-        <button class="theme-btn" onclick="setTheme('neon')">Neon</button>
-        <button class="theme-btn" onclick="setTheme('ocean')">Ocean</button>
-        <button class="theme-btn" onclick="setTheme('forest')">Forest</button>
-        <button class="theme-btn" onclick="setTheme('sunset')">Sunset</button>
-      </div>
-
-      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
-
-      <div><strong>Speedrun Mode</strong></div>
-      <div class="small" style="margin-bottom:8px">Race to reach a money goal!</div>
-      <div style="display:flex;gap:6px;margin-bottom:8px">
-        <input type="number" id="speedrunGoalInput" placeholder="Goal amount" min="1000" max="9999999" value="100000" style="flex:1;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);color:#e6eef6">
-        <button class="btn" onclick="startSpeedrun()" style="padding:8px 16px">START</button>
-      </div>
-
-      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
-
-      <div><strong>Upgrades</strong></div>
-      <div class="shop-item">
-        <div>
-          <div><strong>Income Booster</strong></div>
-          <div class="small">+ $1 / sec</div>
-        </div>
-        <div>
-          <div>$50</div>
-          <button class="btn secondary" onclick="buyUpgrade('income')">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Sell Multiplier</strong></div>
-          <div class="small">+10% sell value</div>
-        </div>
-        <div>
-          <div>$200</div>
-          <button class="btn secondary" onclick="buyUpgrade('sell')">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Auto-Seller</strong></div>
-          <div class="small">Auto-sell Commons every 10s</div>
-        </div>
-        <div>
-          <div>$300</div>
-          <button class="btn secondary" onclick="buyUpgrade('autosell')">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Permanent Luck Stone</strong></div>
-          <div class="small">+5% luck forever</div>
-        </div>
-        <div>
-          <div>$1,500</div>
-          <button class="btn secondary" onclick="buyPermanentItem('luck')">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Double Income Amulet</strong></div>
-          <div class="small">+100% passive income</div>
-        </div>
-        <div>
-          <div>$3,000</div>
-          <button class="btn secondary" onclick="buyPermanentItem('income_amulet')">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Seller's Crown</strong></div>
-          <div class="small">+20% sell multiplier</div>
-        </div>
-        <div>
-          <div>$2,500</div>
-          <button class="btn secondary" onclick="buyPermanentItem('seller')">Buy</button>
-        </div>
-      </div>
-
-      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
-
-      <div><strong>Auto-Clickers</strong></div>
-      <div class="small">Auto-Clickers perform rolls automatically; each pays its own roll cost.</div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Buy Auto-Clicker</strong></div>
-          <div class="small">Starts its own roll cycle</div>
-        </div>
-        <div>
-          <div id="autoClickerPrice">$500</div>
-          <button class="btn" onclick="buyAutoClicker()">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Roll Speed Upgrade</strong></div>
-          <div class="small">-0.5s per purchase (min 0.5s)</div>
-        </div>
-        <div>
-          <div id="speedUpgradePrice">$150</div>
-          <button class="btn secondary" onclick="buySpeedUpgrade()">Buy</button>
-        </div>
-      </div>
-
-      <div class="meta" style="margin-top:8px">Auto-Clickers: <strong id="autoClickerCount">0</strong> • Roll duration: <strong id="rollDurationDisplay">4.0s</strong></div>
-
-      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
-
-      <div><strong>Consumables & Eggs</strong></div>
-      <div class="shop-item">
-        <div>
-          <div><strong>Luck Potion (30s)</strong></div>
-          <div class="small">+30% luck for 30 seconds</div>
-        </div>
-        <div>
-          <div>$75</div>
-          <button class="btn secondary" onclick="buyPotion()">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Epic Egg</strong></div>
-          <div class="small">Guaranteed Epic item</div>
-        </div>
-        <div>
-          <div>$2,000</div>
-          <button class="btn secondary" onclick="buyEgg('Epic')">Buy</button>
-        </div>
-      </div>
-
-      <div class="shop-item">
-        <div>
-          <div><strong>Mythic Egg</strong></div>
-          <div class="small">Guaranteed Mythic item</div>
-        </div>
-        <div>
-          <div>$12,000</div>
-          <button class="btn secondary" onclick="buyEgg('Mythic')">Buy</button>
-        </div>
-      </div>
-
-      <hr style="border:none;border-top:1px dashed rgba(255,255,255,0.03);margin:12px 0"/>
-
-      <div class="controls">
-        <button class="btn secondary" onclick="exportSave()">Export Save</button>
-        <label class="btn secondary" style="cursor:pointer;padding:8px;border-radius:10px">
-          Import Save
-          <input id="fileImport" class="file-input" type="file" accept=".json" onchange="importSave(event)" style="display:none">
-        </label>
-        <button class="btn ghost" onclick="clearAllData()">Clear All</button>
-      </div>
-
-      <div class="download-note muted" style="margin-top:10px">Export creates a JSON save file you can share or reload.</div>
     </div>
+    <div style="margin-top:12px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">Theme</div>
+      <div class="theme-selector">
+        <button class="theme-btn" data-theme="default" onclick="setTheme('default',this)">Default</button>
+        <button class="theme-btn" data-theme="neon"    onclick="setTheme('neon',this)">Neon</button>
+        <button class="theme-btn" data-theme="ocean"   onclick="setTheme('ocean',this)">Ocean</button>
+        <button class="theme-btn" data-theme="forest"  onclick="setTheme('forest',this)">Forest</button>
+        <button class="theme-btn" data-theme="sunset"  onclick="setTheme('sunset',this)">Sunset</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Speedrun</div>
+    <div class="small" style="margin-bottom:8px">Race to a money goal from your current balance.</div>
+    <div style="display:flex;gap:6px">
+      <input type="number" id="speedrunGoalInput" placeholder="Goal ($)" min="1000" max="999999999" value="100000"
+        style="flex:1;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);color:#e6eef6;font-size:13px">
+      <button class="btn" onclick="startSpeedrun()" style="padding:8px 16px">START</button>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Upgrades</div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">Income Booster</div>
+        <div class="small">+$1 / sec passive</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$50</span>
+        <button class="btn secondary" onclick="buyUpgrade('income')">Buy</button>
+      </div>
+    </div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">Sell Multiplier</div>
+        <div class="small">+10% sell value</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$200</span>
+        <button class="btn secondary" onclick="buyUpgrade('sell')">Buy</button>
+      </div>
+    </div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">Auto-Seller</div>
+        <div class="small">Auto-sell Commons every 10s</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$300</span>
+        <button class="btn secondary" id="autoSellBtn" onclick="buyUpgrade('autosell')">Buy</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Permanent Items</div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">💎 Luck Stone</div>
+        <div class="small">+5% luck forever (stackable)</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$1,500</span>
+        <button class="btn secondary" onclick="buyPermanentItem('luck')">Buy</button>
+      </div>
+    </div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">✨ Income Amulet</div>
+        <div class="small">×2 all passive income (once)</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$3,000</span>
+        <button class="btn secondary" id="amuletBtn" onclick="buyPermanentItem('income_amulet')">Buy</button>
+      </div>
+    </div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">👑 Seller's Crown</div>
+        <div class="small">+20% sell value (stackable)</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$2,500</span>
+        <button class="btn secondary" onclick="buyPermanentItem('seller')">Buy</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Automation</div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">Auto-Clicker</div>
+        <div class="small">Runs its own roll loop</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price" id="autoClickerPrice">$500</span>
+        <button class="btn" onclick="buyAutoClicker()">Buy</button>
+      </div>
+    </div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">Roll Speed Upgrade</div>
+        <div class="small">−0.5s per purchase (min 0.5s)</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price" id="speedUpgradePrice">$150</span>
+        <button class="btn secondary" onclick="buySpeedUpgrade()">Buy</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:6px">
+      Auto-Clickers: <strong id="autoClickerCount" style="color:#e6eef6">0</strong>
+      &nbsp;·&nbsp; Roll time: <strong id="rollDurationDisplay" style="color:#e6eef6">4.0s</strong>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Consumables & Eggs</div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">🧪 Luck Potion</div>
+        <div class="small">+30% luck for 30 seconds</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$75</span>
+        <button class="btn secondary" onclick="buyPotion()">Buy</button>
+      </div>
+    </div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">🥚 Epic Egg</div>
+        <div class="small">Guaranteed Epic item</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$2,000</span>
+        <button class="btn secondary" onclick="buyEgg('Epic')">Buy</button>
+      </div>
+    </div>
+    <div class="shop-item">
+      <div>
+        <div style="font-weight:700">🥚 Mythic Egg</div>
+        <div class="small">Guaranteed Mythic item</div>
+      </div>
+      <div class="shop-item-right">
+        <span class="shop-price">$12,000</span>
+        <button class="btn secondary" onclick="buyEgg('Mythic')">Buy</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Save Data</div>
+    <div class="controls">
+      <button class="btn secondary" onclick="exportSave()">⬇ Export</button>
+      <label class="btn secondary" style="cursor:pointer">
+        ⬆ Import
+        <input id="fileImport" type="file" accept=".json" style="display:none">
+      </label>
+      <button class="btn ghost" onclick="clearAllData()">🗑 Clear All</button>
+    </div>
+    <div class="small" style="margin-top:8px;color:var(--muted)">Saves auto-export as JSON. Import to restore.</div>
   </div>
 
 <script>
-/* ---------- Game state ---------- */
 const GAME = {
   money: 100,
   baseIncome: 1,
@@ -443,750 +509,646 @@ const GAME = {
   speedUpgradeDelta: 0.5,
   speedUpgradeMinDuration: 0.5,
   autoClickerTimers: [],
-  lastBugCSV: null,
   theme: 'default',
-  speedrun: {active:false, goal:0, startTime:0, startMoney:0},
+  speedrun: { active: false, goal: 0, startTime: 0, startMoney: 0 },
   rainIntensity: 5,
   expandedRarities: {}
 };
 
 const MATERIAL_VARIANTS = {
-  Common: ['Iron', 'Stone', 'Copper'],
+  Common:   ['Iron', 'Stone', 'Copper'],
   Uncommon: ['Bronze', 'Tin', 'Brass'],
-  Rare: ['Silver', 'Mithril', 'Steel'],
-  Epic: ['Gold', 'Platinum', 'Orichalcum'],
-  Mythic: ['Platinum', 'Adamantite', 'Mithril Prime'],
-  Secret: ['Obsidian', 'Dragonstone', 'Moonstone'],
-  '???': ['Aetheric Core', 'Void Crystal', 'Starlight']
+  Rare:     ['Silver', 'Mithril', 'Steel'],
+  Epic:     ['Gold', 'Platinum', 'Orichalcum'],
+  Mythic:   ['Platinum', 'Adamantite', 'Mithril Prime'],
+  Secret:   ['Obsidian', 'Dragonstone', 'Moonstone'],
+  '???':    ['Aetheric Core', 'Void Crystal', 'Starlight']
 };
 
 const RARITIES = [
-  {key:'Common', weight:50, color:'r-common', sell:5, itemPrefix:'Iron', income:0.10},
-  {key:'Uncommon', weight:25, color:'r-uncommon', sell:20, itemPrefix:'Bronze', income:0.50},
-  {key:'Rare', weight:12, color:'r-rare', sell:100, itemPrefix:'Silver', income:2},
-  {key:'Epic', weight:8, color:'r-epic', sell:500, itemPrefix:'Gold', income:10},
-  {key:'Mythic', weight:3, color:'r-mythic', sell:2000, itemPrefix:'Platinum', income:50},
-  {key:'Secret', weight:1, color:'r-secret', sell:10000, itemPrefix:'Obsidian', income:200},
-  {key:'???', weight:1, color:'r-unknown', sell:50000, itemPrefix:'Aetheric Core', income:1000}
+  { key: 'Common',   weight: 50, color: 'r-common',   sell: 5,     itemPrefix: 'Iron',         income: 0.10 },
+  { key: 'Uncommon', weight: 25, color: 'r-uncommon', sell: 20,    itemPrefix: 'Bronze',        income: 0.50 },
+  { key: 'Rare',     weight: 12, color: 'r-rare',     sell: 100,   itemPrefix: 'Silver',        income: 2    },
+  { key: 'Epic',     weight:  8, color: 'r-epic',     sell: 500,   itemPrefix: 'Gold',          income: 10   },
+  { key: 'Mythic',   weight:  3, color: 'r-mythic',   sell: 2000,  itemPrefix: 'Platinum',      income: 50   },
+  { key: 'Secret',   weight:  1, color: 'r-secret',   sell: 10000, itemPrefix: 'Obsidian',      income: 200  },
+  { key: '???',      weight:  1, color: 'r-unknown',  sell: 50000, itemPrefix: 'Aetheric Core', income: 1000 }
 ];
 
-const PERMANENT_ITEMS = {
-  luck: {name:'Luck Stone', desc:'+5% luck', icon:'💎'},
-  income_amulet: {name:'Double Income Amulet', desc:'+100% passive income', icon:'✨'},
-  seller: {name:"Seller's Crown", desc:'+20% sell', icon:'👑'}
-};
-
-/* ---------- UI refs ---------- */
 const UI = {
-  money: document.getElementById('money'),
-  income: document.getElementById('income'),
-  luck: document.getElementById('luck'),
-  inventory: document.getElementById('inventory'),
-  inventoryIncome: document.getElementById('inventoryIncome'),
-  lastName: document.getElementById('lastName'),
-  lastRarity: document.getElementById('lastRarity'),
-  log: document.getElementById('log'),
-  manualRollBtn: document.getElementById('manualRollBtn'),
-  rollProgress: document.getElementById('rollProgress'),
-  rollDurationLabel: document.getElementById('rollDurationLabel'),
+  money:               document.getElementById('money'),
+  income:              document.getElementById('income'),
+  luckDisplay:         document.getElementById('luckDisplay'),
+  inventory:           document.getElementById('inventory'),
+  inventoryIncome:     document.getElementById('inventoryIncome'),
+  lastName:            document.getElementById('lastName'),
+  lastRarity:          document.getElementById('lastRarity'),
+  log:                 document.getElementById('log'),
+  manualRollBtn:       document.getElementById('manualRollBtn'),
+  rollProgress:        document.getElementById('rollProgress'),
+  rollDurationLabel:   document.getElementById('rollDurationLabel'),
   rollDurationDisplay: document.getElementById('rollDurationDisplay'),
-  autoClickerCount: document.getElementById('autoClickerCount'),
-  autoClickerPrice: document.getElementById('autoClickerPrice'),
-  speedUpgradePrice: document.getElementById('speedUpgradePrice'),
-  fileImport: document.getElementById('fileImport'),
-  moneyFall: document.getElementById('moneyFall'),
-  permItems: document.getElementById('permItems'),
-  speedrunPanel: document.getElementById('speedrunPanel'),
-  speedrunTimer: document.getElementById('speedrunTimer'),
-  speedrunGoal: document.getElementById('speedrunGoal'),
+  autoClickerCount:    document.getElementById('autoClickerCount'),
+  autoClickerPrice:    document.getElementById('autoClickerPrice'),
+  speedUpgradePrice:   document.getElementById('speedUpgradePrice'),
+  fileImport:          document.getElementById('fileImport'),
+  moneyFall:           document.getElementById('moneyFall'),
+  permItems:           document.getElementById('permItems'),
+  speedrunPanel:       document.getElementById('speedrunPanel'),
+  speedrunTimer:       document.getElementById('speedrunTimer'),
+  speedrunGoalDisplay: document.getElementById('speedrunGoalDisplay'),
   speedrunProgressBar: document.getElementById('speedrunProgressBar'),
   rainIntensitySlider: document.getElementById('rainIntensitySlider'),
-  rainIntensityLabel: document.getElementById('rainIntensityLabel')
+  rainIntensityLabel:  document.getElementById('rainIntensityLabel'),
+  autoSellBtn:         document.getElementById('autoSellBtn'),
+  amuletBtn:           document.getElementById('amuletBtn')
 };
 
-/* ---------- Helpers ---------- */
-function formatMoney(n){ return '$' + Math.floor(n).toLocaleString(); }
-function calculateItemIncome(){
+function formatMoney(n) { return '$' + Math.floor(n).toLocaleString(); }
+
+function calculateItemIncome() {
   let total = 0;
-  for(const r of RARITIES){
-    const count = GAME.inventory[r.key] || 0;
-    total += count * (r.income || 0);
-  }
+  for (const r of RARITIES) total += (GAME.inventory[r.key] || 0) * r.income;
   return total;
 }
-function log(msg){
+
+function log(msg, type) {
   const line = document.createElement('div');
-  line.className = 'log-line';
-  line.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
+  line.className = 'log-line' + (type ? ' log-' + type : '');
+  line.textContent = new Date().toLocaleTimeString() + ' — ' + msg;
   UI.log.prepend(line);
-  while(UI.log.children.length>300) UI.log.removeChild(UI.log.lastChild);
+  while (UI.log.children.length > 300) UI.log.removeChild(UI.log.lastChild);
 }
 
-/* ---------- Rain Intensity ---------- */
-function updateRainIntensity(){
-  const val = parseInt(UI.rainIntensitySlider.value);
+function updateRainIntensity(el) {
+  const val = parseInt(el.value);
   GAME.rainIntensity = val;
-  UI.rainIntensityLabel.textContent = `${val}/10`;
+  UI.rainIntensityLabel.textContent = val + '/10';
   localStorage.setItem('idleGachaRainIntensity', val);
 }
 
-function loadRainIntensity(){
+function loadRainIntensity() {
   const saved = localStorage.getItem('idleGachaRainIntensity');
-  if(saved){
+  if (saved !== null) {
     GAME.rainIntensity = parseInt(saved);
     UI.rainIntensitySlider.value = saved;
-    UI.rainIntensityLabel.textContent = `${saved}/10`;
+    UI.rainIntensityLabel.textContent = saved + '/10';
   }
 }
 
-/* ---------- Speedrun Mode ---------- */
-function startSpeedrun(){
+function startSpeedrun() {
+  if (GAME.speedrun.active) { log('Speedrun already running.', 'warn'); return; }
   const goal = parseInt(document.getElementById('speedrunGoalInput').value) || 100000;
-  GAME.speedrun.active = true;
-  GAME.speedrun.goal = goal;
-  GAME.speedrun.startTime = Date.now();
+  GAME.speedrun.active     = true;
+  GAME.speedrun.goal       = goal;
+  GAME.speedrun.startTime  = Date.now();
   GAME.speedrun.startMoney = GAME.money;
   UI.speedrunPanel.style.display = 'block';
-  UI.speedrunGoal.textContent = `Goal: ${formatMoney(goal)}`;
-  log(`🏁 SPEEDRUN STARTED! Goal: ${formatMoney(goal)}`);
+  UI.speedrunGoalDisplay.textContent = 'Goal: ' + formatMoney(goal);
+  log('🏁 SPEEDRUN STARTED! Goal: ' + formatMoney(goal), 'good');
   updateSpeedrunDisplay();
   speedrunTick();
 }
 
-function cancelSpeedrun(){
+function cancelSpeedrun() {
   GAME.speedrun.active = false;
   UI.speedrunPanel.style.display = 'none';
   log('Speedrun cancelled.');
   updateUI();
 }
 
-function finishSpeedrun(){
-  if(!GAME.speedrun.active) return;
+function finishSpeedrun() {
+  if (!GAME.speedrun.active) return;
   const elapsed = (Date.now() - GAME.speedrun.startTime) / 1000;
-  const earned = GAME.money - GAME.speedrun.startMoney;
+  const earned  = GAME.money - GAME.speedrun.startMoney;
+  const goal    = GAME.speedrun.goal;
+  const reached = GAME.money >= goal;
   GAME.speedrun.active = false;
   UI.speedrunPanel.style.display = 'none';
-  
-  if(GAME.money >= GAME.speedrun.goal){
-    const minutes = Math.floor(elapsed / 60);
-    const seconds = Math.floor(elapsed % 60);
-    const time = `${minutes}m ${seconds}s`;
-    log(`🎉 SPEEDRUN COMPLETE in ${time}! Earned ${formatMoney(earned)}`);
+  if (reached) {
+    const m = Math.floor(elapsed / 60), s = Math.floor(elapsed % 60);
+    log('🎉 SPEEDRUN COMPLETE in ' + m + 'm ' + s + 's! Earned ' + formatMoney(earned), 'good');
     spawnMoneyRain(300);
-    for(let i=0;i<20;i++){
-      spawnParticle('✨', Math.random()*window.innerWidth, Math.random()*window.innerHeight);
-    }
+    for (let i = 0; i < 20; i++) spawnParticle('✨', Math.random() * window.innerWidth, Math.random() * window.innerHeight);
   } else {
-    log(`❌ Speedrun not complete. Need ${formatMoney(GAME.speedrun.goal - GAME.money)} more.`);
+    log('❌ Speedrun not complete. Need ' + formatMoney(goal - GAME.money) + ' more.', 'error');
   }
   updateUI();
 }
 
-function speedrunTick(){
-  if(!GAME.speedrun.active) return;
+function speedrunTick() {
+  if (!GAME.speedrun.active) return;
   updateSpeedrunDisplay();
   setTimeout(speedrunTick, 100);
 }
 
-function updateSpeedrunDisplay(){
-  if(!GAME.speedrun.active) return;
+function updateSpeedrunDisplay() {
+  if (!GAME.speedrun.active) return;
   const elapsed = (Date.now() - GAME.speedrun.startTime) / 1000;
-  const minutes = Math.floor(elapsed / 60);
-  const seconds = Math.floor(elapsed % 60);
-  UI.speedrunTimer.textContent = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
-  
-  const progress = Math.min(100, (GAME.money / GAME.speedrun.goal) * 100);
-  UI.speedrunProgressBar.style.width = progress + '%';
+  const m = Math.floor(elapsed / 60), s = Math.floor(elapsed % 60);
+  UI.speedrunTimer.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  UI.speedrunProgressBar.style.width = Math.min(100, (GAME.money / GAME.speedrun.goal) * 100) + '%';
 }
 
-/* ---------- Theme System ---------- */
-function setTheme(theme){
+function setTheme(theme, btnEl) {
   GAME.theme = theme;
-  document.body.className = theme === 'default' ? '' : `theme-${theme}`;
+  document.body.classList.remove('theme-neon','theme-ocean','theme-forest','theme-sunset');
+  if (theme !== 'default') document.body.classList.add('theme-' + theme);
   localStorage.setItem('idleGachaTheme', theme);
-  document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
 }
 
-function loadTheme(){
+function loadTheme() {
   const saved = localStorage.getItem('idleGachaTheme') || 'default';
-  if(saved !== 'default') document.body.className = `theme-${saved}`;
   GAME.theme = saved;
+  document.body.classList.remove('theme-neon','theme-ocean','theme-forest','theme-sunset');
+  if (saved !== 'default') document.body.classList.add('theme-' + saved);
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === saved);
+  });
 }
 
-/* ---------- Visual money rain ---------- */
-function spawnMoneyRain(amount){
-  if(GAME.rainIntensity === 0) return;
-  const intensityMultiplier = GAME.rainIntensity / 5;
-  const count = Math.min(40, Math.max(1, Math.round((amount / 10) * intensityMultiplier)));
-  const container = UI.moneyFall;
-  for(let i=0;i<count;i++){
-    const el = document.createElement('div');
+function spawnMoneyRain(amount) {
+  if (GAME.rainIntensity === 0 || amount < 3) return;
+  const count = Math.min(40, Math.max(1, Math.round((amount / 10) * (GAME.rainIntensity / 5))));
+  for (let i = 0; i < count; i++) {
+    const el  = document.createElement('div');
     el.className = 'money';
     el.textContent = '$';
-    const size = 12 + Math.random()*28;
-    el.style.fontSize = size + 'px';
-    el.style.left = (5 + Math.random()*90) + '%';
-    el.style.top = (-10 - Math.random()*10) + 'vh';
-    const delay = Math.random()*0.2;
-    const duration = 1.2 + Math.random()*1.6;
-    el.style.animationDuration = duration + 's';
-    el.style.animationDelay = delay + 's';
-    el.style.opacity = 0;
-    el.style.transform = `translateY(-10vh) rotate(${(-20 + Math.random()*40)}deg)`;
-    container.appendChild(el);
-    setTimeout(()=> { el.remove(); }, (delay + duration + 0.2) * 1000);
+    const size  = 12 + Math.random() * 28;
+    const delay = Math.random() * 0.2;
+    const dur   = 1.2 + Math.random() * 1.6;
+    el.style.cssText = 'font-size:' + size + 'px;left:' + (5 + Math.random()*90) + '%;top:' + (-10 - Math.random()*10) + 'vh;animation-duration:' + dur + 's;animation-delay:' + delay + 's';
+    UI.moneyFall.appendChild(el);
+    setTimeout(() => el.remove(), (delay + dur + 0.2) * 1000);
   }
 }
 
-function spawnParticle(emoji, x, y){
+function spawnParticle(emoji, x, y) {
   const el = document.createElement('div');
   el.textContent = emoji;
-  el.style.position = 'fixed';
-  el.style.left = x + 'px';
-  el.style.top = y + 'px';
-  el.style.fontSize = '24px';
-  el.style.pointerEvents = 'none';
-  el.style.zIndex = '1000';
-  el.style.animation = 'rise 1s ease-out forwards';
+  el.style.cssText = 'position:fixed;left:' + x + 'px;top:' + y + 'px;font-size:24px;pointer-events:none;z-index:1000;animation:rise 1s ease-out forwards';
   document.body.appendChild(el);
-  setTimeout(()=> el.remove(), 1000);
+  setTimeout(() => el.remove(), 1000);
 }
 
-/* ---------- Rarity roll ---------- */
-function weightedRarityRoll(luckPercent=0){
+function weightedRarityRoll(luckPercent) {
+  luckPercent = luckPercent || 0;
   const weights = RARITIES.map(r => r.weight);
-  if(luckPercent>0){
-    const bonusTotal = (luckPercent/100) * 10;
-    for(let i=1;i<RARITIES.length;i++){
-      const factor = (i) / (RARITIES.length-1);
-      weights[i] += bonusTotal * factor;
-      weights[0] = Math.max(1, weights[0] - (bonusTotal * 0.2));
-    }
+  if (luckPercent > 0) {
+    const bonus = (luckPercent / 100) * 10;
+    for (let i = 1; i < RARITIES.length; i++) weights[i] += bonus * (i / (RARITIES.length - 1));
+    weights[0] = Math.max(1, weights[0] - bonus * 0.2);
   }
-  const sum = weights.reduce((a,b)=>a+b,0);
-  let r = Math.random()*sum;
-  for(let i=0;i<weights.length;i++){
-    if(r < weights[i]) return RARITIES[i];
+  const sum = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * sum;
+  for (let i = 0; i < weights.length; i++) {
+    if (r < weights[i]) return RARITIES[i];
     r -= weights[i];
   }
   return RARITIES[0];
 }
 
-function getVariantMaterial(rarity){
+function getVariantMaterial(rarity) {
   const variants = MATERIAL_VARIANTS[rarity.key];
-  const variant = variants[Math.floor(Math.random() * variants.length)];
-  const multiplier = 0.95 + Math.random() * 0.1;
-  return {variant, multiplier};
+  return {
+    variant:    variants[Math.floor(Math.random() * variants.length)],
+    multiplier: 0.95 + Math.random() * 0.1
+  };
 }
 
-/* ---------- Roll system (duration + auto-clickers) ---------- */
-let manualRollState = {busy:false, remaining:0, interval:null};
+let manualRollState = { busy: false, interval: null };
 
-function startRoll(source='manual', autoIndex=null){
-  if(manualRollState.busy && source==='manual') return false;
-  if(source==='auto' && autoIndex!=null){
-    if(GAME.autoClickerTimers[autoIndex].busy) return false;
-  }
-  if(GAME.money < GAME.rollCost) return false;
+function startRoll(source, autoIndex) {
+  if (source === 'manual' && manualRollState.busy) return false;
+  if (source === 'auto'   && GAME.autoClickerTimers[autoIndex].busy) return false;
+  if (GAME.money < GAME.rollCost) return false;
+
   GAME.money -= GAME.rollCost;
   updateUI();
 
-  const duration = Math.max(GAME.rollDuration, GAME.speedUpgradeMinDuration);
-  const start = Date.now();
-  const end = start + duration*1000;
+  const duration = GAME.rollDuration;
+  const end      = Date.now() + duration * 1000;
 
-  if(source==='manual'){
+  if (source === 'manual') {
     manualRollState.busy = true;
-    manualRollState.remaining = duration;
     UI.manualRollBtn.disabled = true;
     UI.manualRollBtn.textContent = 'Rolling...';
-    manualRollState.interval = setInterval(()=>{
-      const now = Date.now();
-      const rem = Math.max(0, (end - now)/1000);
-      manualRollState.remaining = rem;
-      const pct = ((duration - rem)/duration)*100;
-      UI.rollProgress.style.width = `${Math.min(100,pct)}%`;
-      if(rem <= 0){
+    manualRollState.interval = setInterval(() => {
+      const rem = Math.max(0, (end - Date.now()) / 1000);
+      UI.rollProgress.style.width = Math.min(100, ((duration - rem) / duration) * 100) + '%';
+      if (rem <= 0) {
         clearInterval(manualRollState.interval);
         manualRollState.busy = false;
         UI.manualRollBtn.disabled = false;
         UI.manualRollBtn.textContent = 'ROLL!';
-        UI.rollProgress.style.width = `0%`;
+        UI.rollProgress.style.width = '0%';
         completeRoll('manual');
       }
     }, 80);
-  } else if(source==='auto' && autoIndex!=null){
+  } else {
     GAME.autoClickerTimers[autoIndex].busy = true;
-    GAME.autoClickerTimers[autoIndex].remaining = duration;
-    GAME.autoClickerTimers[autoIndex].end = end;
+    GAME.autoClickerTimers[autoIndex].end  = end;
   }
   return true;
 }
 
-function completeRoll(source='manual', autoIndex=null){
-  const totalLuck = GAME.luckPercent + (GAME.permanentLuckStones * 5);
-  const rarity = weightedRarityRoll(totalLuck);
-  const {variant, multiplier} = getVariantMaterial(rarity);
-  const name = `${variant} ${rarity.key}`;
+function completeRoll(source) {
+  const totalLuck = GAME.luckPercent + GAME.permanentLuckStones * 5;
+  const rarity    = weightedRarityRoll(totalLuck);
+  const { variant, multiplier } = getVariantMaterial(rarity);
+  const name        = variant + ' ' + rarity.key;
   const adjustedSell = Math.round(rarity.sell * multiplier);
-  const adjustedIncome = rarity.income * multiplier;
-  
-  GAME.inventory[rarity.key] = (GAME.inventory[rarity.key]||0) + 1;
-  UI.lastName.textContent = name;
+
+  GAME.inventory[rarity.key] = (GAME.inventory[rarity.key] || 0) + 1;
+  UI.lastName.textContent   = name;
   UI.lastRarity.textContent = rarity.key;
-  UI.lastRarity.className = 'small ' + rarity.color;
-  log(`Rolled: ${name} (${source === 'auto' ? 'Auto' : 'Manual'}) ${multiplier > 1 ? '⭐' : ''}`);
-  spawnMoneyRain(Math.max(5, Math.min(200, adjustedSell/5)));
-  
-  if(multiplier > 1.02) spawnParticle('✨', Math.random()*window.innerWidth, 100);
-  
-  if(GAME.autoSell && rarity.key === 'Common'){
-    setTimeout(()=>{
-      sellOne('Common');
-    }, 10000);
+  UI.lastRarity.className   = 'small ' + rarity.color;
+
+  const label = source === 'auto' ? 'Auto' : 'Manual';
+  const tier  = rarity.key === '???' || rarity.key === 'Secret' ? 'good' : '';
+  log('Rolled: ' + name + ' (' + label + ')' + (multiplier > 1.02 ? ' ⭐' : ''), tier);
+  spawnMoneyRain(Math.max(5, Math.min(200, adjustedSell / 5)));
+  if (multiplier > 1.02) spawnParticle('✨', Math.random() * window.innerWidth, 100);
+
+  if (GAME.autoSell && rarity.key === 'Common') {
+    setTimeout(() => { if ((GAME.inventory['Common'] || 0) > 0) sellOne('Common'); }, 10000);
   }
-  
   updateUI();
 }
 
-/* Auto-clicker tick */
-function autoClickerTick(){
-  for(let i=0;i<GAME.autoClickers;i++){
+function autoClickerTick() {
+  for (let i = 0; i < GAME.autoClickers; i++) {
     const t = GAME.autoClickerTimers[i];
-    if(!t) continue;
-    if(t.busy){
-      const now = Date.now();
-      const rem = Math.max(0, (t.end - now)/1000);
-      t.remaining = rem;
-      if(rem <= 0){
+    if (!t) continue;
+    if (t.busy) {
+      if ((t.end - Date.now()) <= 0) {
         t.busy = false;
-        t.remaining = 0;
-        completeRoll('auto', i);
+        completeRoll('auto');
       }
-    } else {
-      if(GAME.money >= GAME.rollCost){
-        startRoll('auto', i);
-      }
+    } else if (GAME.money >= GAME.rollCost) {
+      startRoll('auto', i);
     }
   }
 }
 
-/* ---------- Selling & spawn visuals ---------- */
-function sellOne(rarityKey){
-  const r = RARITIES.find(x=>x.key===rarityKey);
-  if(!r || (GAME.inventory[rarityKey]||0) <= 0) return;
+function sellOne(rarityKey) {
+  const r = RARITIES.find(x => x.key === rarityKey);
+  if (!r || (GAME.inventory[rarityKey] || 0) <= 0) return;
   GAME.inventory[rarityKey]--;
   const gain = r.sell * GAME.sellMultiplier;
   GAME.money += gain;
-  log(`Sold ${r.itemPrefix} ${r.key} for ${formatMoney(gain)}`);
+  log('Sold ' + r.itemPrefix + ' ' + r.key + ' for ' + formatMoney(gain));
   spawnMoneyRain(gain);
   updateUI();
 }
 
-function sellAllRarity(rarityKey){
-  const r = RARITIES.find(x=>x.key===rarityKey);
-  if(!r) return;
+function sellAllRarity(rarityKey) {
+  const r = RARITIES.find(x => x.key === rarityKey);
+  if (!r) return;
   const count = GAME.inventory[rarityKey] || 0;
-  if(count <= 0) return;
+  if (count <= 0) return;
   const total = count * r.sell * GAME.sellMultiplier;
   GAME.money += total;
   GAME.inventory[rarityKey] = 0;
-  log(`Sold all ${count}x ${r.key} for ${formatMoney(total)}`);
+  log('Sold all ' + count + 'x ' + r.key + ' for ' + formatMoney(total), 'good');
   spawnMoneyRain(total);
   updateUI();
 }
 
-/* ---------- Shop ---------- */
-function buyUpgrade(type){
-  if(type==='income'){
-    if(GAME.money < 50){ log('Not enough money for Income Booster'); return; }
+function buyUpgrade(type) {
+  if (type === 'income') {
+    if (GAME.money < 50) { log('Not enough money for Income Booster', 'warn'); return; }
     GAME.money -= 50;
-    GAME.incomeBoosts += 1;
-    log('Bought Income Booster (+$1 base income/sec)');
+    GAME.incomeBoosts++;
+    log('Bought Income Booster (+$1/sec)');
     spawnMoneyRain(20);
-  } else if(type==='sell'){
-    if(GAME.money < 200){ log('Not enough money for Sell Multiplier'); return; }
+  } else if (type === 'sell') {
+    if (GAME.money < 200) { log('Not enough money for Sell Multiplier', 'warn'); return; }
     GAME.money -= 200;
     GAME.sellMultiplier += 0.10;
-    log(`Bought Sell Multiplier (now ${(GAME.sellMultiplier*100).toFixed(0)}%)`);
+    log('Bought Sell Multiplier (now ' + (GAME.sellMultiplier * 100).toFixed(0) + '%)');
     spawnMoneyRain(40);
-  } else if(type==='autosell'){
-    if(GAME.autoSell){ log('Auto-Seller already active'); return; }
-    if(GAME.money < 300){ log('Not enough money for Auto-Seller'); return; }
+  } else if (type === 'autosell') {
+    if (GAME.autoSell) { log('Auto-Seller already active', 'warn'); return; }
+    if (GAME.money < 300) { log('Not enough money for Auto-Seller', 'warn'); return; }
     GAME.money -= 300;
     GAME.autoSell = true;
-    log('Bought Auto-Seller (Commons will auto-sell every 10s)');
+    log('Bought Auto-Seller — Commons sell every 10s');
     spawnMoneyRain(60);
   }
   updateUI();
 }
 
-function buyPermanentItem(itemKey){
-  const item = PERMANENT_ITEMS[itemKey];
-  if(!item){ log('Invalid permanent item'); return; }
-  
-  let price = 0;
-  if(itemKey === 'luck'){
-    price = 1500;
-    if(GAME.money < price){ log('Not enough money for Luck Stone'); return; }
-    GAME.money -= price;
-    GAME.permanentLuckStones += 1;
-    log(`Bought Luck Stone #${GAME.permanentLuckStones} (+5% permanent luck)`);
-  } else if(itemKey === 'income_amulet'){
-    if(GAME.incomeAmuletActive){ log('Double Income Amulet already purchased'); return; }
-    price = 3000;
-    if(GAME.money < price){ log('Not enough money for Double Income Amulet'); return; }
-    GAME.money -= price;
+function buyPermanentItem(itemKey) {
+  if (itemKey === 'luck') {
+    if (GAME.money < 1500) { log('Not enough money for Luck Stone', 'warn'); return; }
+    GAME.money -= 1500;
+    GAME.permanentLuckStones++;
+    log('Bought Luck Stone #' + GAME.permanentLuckStones + ' (+5% permanent luck)', 'good');
+    spawnMoneyRain(50);
+  } else if (itemKey === 'income_amulet') {
+    if (GAME.incomeAmuletActive) { log('Income Amulet already purchased', 'warn'); return; }
+    if (GAME.money < 3000) { log('Not enough money for Income Amulet', 'warn'); return; }
+    GAME.money -= 3000;
     GAME.incomeAmuletActive = true;
-    log('Bought Double Income Amulet (+100% passive income)');
-  } else if(itemKey === 'seller'){
-    price = 2500;
-    if(GAME.money < price){ log('Not enough money for Seller\'s Crown'); return; }
-    GAME.money -= price;
-    GAME.sellersCrowns += 1;
+    log('Bought Double Income Amulet (×2 passive income)', 'good');
+    spawnMoneyRain(100);
+  } else if (itemKey === 'seller') {
+    if (GAME.money < 2500) { log("Not enough money for Seller's Crown", 'warn'); return; }
+    GAME.money -= 2500;
+    GAME.sellersCrowns++;
     GAME.sellMultiplier += 0.20;
-    log(`Bought Seller's Crown #${GAME.sellersCrowns} (+20% sell multiplier, now ${(GAME.sellMultiplier*100).toFixed(0)}%)`);
+    log("Bought Seller's Crown #" + GAME.sellersCrowns + ' (+20% sell, now ' + (GAME.sellMultiplier * 100).toFixed(0) + '%)', 'good');
+    spawnMoneyRain(80);
   }
-  
-  spawnMoneyRain(Math.max(30, price/30));
   updateUI();
 }
 
-/* Auto-clicker pricing and purchase */
-function getAutoClickerPrice(){
+function getAutoClickerPrice() {
   return GAME.autoClickerBasePrice * Math.pow(GAME.autoClickerPriceMultiplier, GAME.autoClickers);
 }
-function buyAutoClicker(){
+
+function buyAutoClicker() {
   const price = Math.ceil(getAutoClickerPrice());
-  if(GAME.money < price){ log('Not enough money for Auto-Clicker'); return; }
+  if (GAME.money < price) { log('Not enough money for Auto-Clicker', 'warn'); return; }
   GAME.money -= price;
-  GAME.autoClickers += 1;
-  GAME.autoClickerTimers.push({busy:false, remaining:0, end:0});
-  log(`Bought Auto-Clicker #${GAME.autoClickers} for ${formatMoney(price)}.`);
+  GAME.autoClickers++;
+  GAME.autoClickerTimers.push({ busy: false, end: 0 });
+  log('Bought Auto-Clicker #' + GAME.autoClickers + ' for ' + formatMoney(price));
   spawnMoneyRain(30);
   updateUI();
 }
 
-/* Speed upgrade */
-function getSpeedUpgradePrice(){ return GAME.speedUpgradeBasePrice * (1 + GAME.speedUpgradeLevel*0.6); }
-function buySpeedUpgrade(){
+function getSpeedUpgradePrice() {
+  return GAME.speedUpgradeBasePrice * (1 + GAME.speedUpgradeLevel * 0.6);
+}
+
+function buySpeedUpgrade() {
   const price = Math.ceil(getSpeedUpgradePrice());
-  if(GAME.money < price){ log('Not enough money for Speed Upgrade'); return; }
-  if(GAME.rollDuration <= GAME.speedUpgradeMinDuration + 0.0001){ log('Roll duration already at minimum.'); return; }
+  if (GAME.money < price) { log('Not enough money for Speed Upgrade', 'warn'); return; }
+  if (GAME.rollDuration <= GAME.speedUpgradeMinDuration) { log('Roll duration already at minimum.', 'warn'); return; }
   GAME.money -= price;
-  GAME.speedUpgradeLevel += 1;
-  GAME.rollDuration = Math.max(GAME.speedUpgradeMinDuration, GAME.rollDuration - GAME.speedUpgradeDelta);
-  log(`Bought Roll Speed Upgrade. New roll duration: ${GAME.rollDuration.toFixed(1)}s`);
+  GAME.speedUpgradeLevel++;
+  GAME.rollDuration = Math.round(Math.max(GAME.speedUpgradeMinDuration, GAME.rollDuration - GAME.speedUpgradeDelta) * 10) / 10;
+  log('Speed Upgrade — roll time now ' + GAME.rollDuration.toFixed(1) + 's');
   spawnMoneyRain(25);
   updateUI();
 }
 
-/* Potions and eggs */
-function buyPotion(){
-  if(GAME.money < 75){ log('Not enough money for Luck Potion'); return; }
+function buyPotion() {
+  if (GAME.money < 75) { log('Not enough money for Luck Potion', 'warn'); return; }
   GAME.money -= 75;
   GAME.luckPercent += 30;
-  log('Used Luck Potion: +30% luck for 30s');
+  log('🧪 Luck Potion active — +30% luck for 30s', 'good');
   spawnMoneyRain(15);
   updateUI();
-  setTimeout(()=>{
+  setTimeout(() => {
     GAME.luckPercent = Math.max(0, GAME.luckPercent - 30);
-    log('Luck Potion expired');
+    log('Luck Potion expired.');
     updateUI();
   }, 30000);
 }
 
-function buyEgg(rarityName){
-  const r = RARITIES.find(x=>x.key===rarityName);
-  if(!r){ log('Invalid egg'); return; }
-  const priceMap = {Epic:2000, Mythic:12000, Secret:50000};
-  const price = priceMap[rarityName] || 99999;
-  if(GAME.money < price){ log('Not enough money for that egg'); return; }
+function buyEgg(rarityName) {
+  const r = RARITIES.find(x => x.key === rarityName);
+  if (!r) return;
+  const prices = { Epic: 2000, Mythic: 12000, Secret: 50000 };
+  const price  = prices[rarityName];
+  if (!price) return;
+  if (GAME.money < price) { log('Not enough money for that egg', 'warn'); return; }
   GAME.money -= price;
-  GAME.inventory[rarityName] = (GAME.inventory[rarityName]||0) + 1;
-  log(`Bought ${rarityName} Egg and received ${r.itemPrefix} ${rarityName}`);
-  spawnMoneyRain(price/10);
+  GAME.inventory[rarityName] = (GAME.inventory[rarityName] || 0) + 1;
+  log('🥚 Bought ' + rarityName + ' Egg — received ' + r.itemPrefix + ' ' + rarityName, 'good');
+  spawnMoneyRain(price / 10);
   updateUI();
 }
 
-/* ---------- Passive income tick ---------- */
-function passiveIncomeTick(){
-  const base = GAME.baseIncome + GAME.incomeBoosts;
-  const itemsIncome = calculateItemIncome();
-  let totalIncome = base + itemsIncome;
-  
-  if(GAME.incomeAmuletActive){
-    totalIncome = totalIncome * 2;
-  }
-  
-  GAME.money += totalIncome;
-  spawnMoneyRain(Math.max(2, Math.min(200, totalIncome)));
+function passiveIncomeTick() {
+  const base  = GAME.baseIncome + GAME.incomeBoosts;
+  const items = calculateItemIncome();
+  const total = (base + items) * (GAME.incomeAmuletActive ? 2 : 1);
+  GAME.money += total;
+  if (total >= 5) spawnMoneyRain(Math.min(200, total));
   updateUI();
 }
 setInterval(passiveIncomeTick, 1000);
-
-/* Auto-clicker tick */
 setInterval(autoClickerTick, 180);
 
-/* ---------- Persistence (localStorage + cookie + export/import) ---------- */
 const SAVE_KEY = 'idleGachaSave_v_visual';
-const COOKIE_NAME = 'idleGachaSaveCookie_v_visual';
 
-function saveGame(){
-  const save = {
-    money: GAME.money,
-    baseIncome: GAME.baseIncome,
-    incomeBoosts: GAME.incomeBoosts,
-    incomeAmuletActive: GAME.incomeAmuletActive,
-    sellMultiplier: GAME.sellMultiplier,
-    autoSell: GAME.autoSell,
-    luckPercent: GAME.luckPercent,
+function buildSaveObject() {
+  return {
+    money:               GAME.money,
+    baseIncome:          GAME.baseIncome,
+    incomeBoosts:        GAME.incomeBoosts,
+    incomeAmuletActive:  GAME.incomeAmuletActive,
+    sellMultiplier:      GAME.sellMultiplier,
+    autoSell:            GAME.autoSell,
     permanentLuckStones: GAME.permanentLuckStones,
-    sellersCrowns: GAME.sellersCrowns,
-    inventory: GAME.inventory,
-    autoClickers: GAME.autoClickers,
-    rollDuration: GAME.rollDuration,
-    speedUpgradeLevel: GAME.speedUpgradeLevel,
-    theme: GAME.theme,
-    rainIntensity: GAME.rainIntensity
+    sellersCrowns:       GAME.sellersCrowns,
+    inventory:           GAME.inventory,
+    autoClickers:        GAME.autoClickers,
+    rollDuration:        GAME.rollDuration,
+    speedUpgradeLevel:   GAME.speedUpgradeLevel,
+    theme:               GAME.theme,
+    rainIntensity:       GAME.rainIntensity
   };
-  try{
-    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(save))}; path=/; max-age=${60*60*24*365}`;
-  }catch(e){ console.warn('Save failed', e); }
+}
+
+function saveGame() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(buildSaveObject())); }
+  catch(e) { console.warn('Save failed', e); }
 }
 setInterval(saveGame, 5000);
 
-function loadGame(){
+function loadGame() {
   const s = localStorage.getItem(SAVE_KEY);
-  if(s){
-    try{
-      const save = JSON.parse(s);
-      GAME.money = save.money ?? GAME.money;
-      GAME.baseIncome = save.baseIncome ?? GAME.baseIncome;
-      GAME.incomeBoosts = save.incomeBoosts ?? GAME.incomeBoosts;
-      GAME.incomeAmuletActive = save.incomeAmuletActive ?? GAME.incomeAmuletActive;
-      GAME.sellMultiplier = save.sellMultiplier ?? GAME.sellMultiplier;
-      GAME.autoSell = save.autoSell ?? GAME.autoSell;
-      GAME.luckPercent = save.luckPercent ?? GAME.luckPercent;
-      GAME.permanentLuckStones = save.permanentLuckStones ?? GAME.permanentLuckStones;
-      GAME.sellersCrowns = save.sellersCrowns ?? GAME.sellersCrowns;
-      GAME.inventory = save.inventory ?? GAME.inventory;
-      GAME.autoClickers = save.autoClickers ?? GAME.autoClickers;
-      GAME.rollDuration = save.rollDuration ?? GAME.rollDuration;
-      GAME.speedUpgradeLevel = save.speedUpgradeLevel ?? GAME.speedUpgradeLevel;
-      GAME.theme = save.theme ?? 'default';
-      GAME.rainIntensity = save.rainIntensity ?? 5;
-      GAME.autoClickerTimers = [];
-      for(let i=0;i<GAME.autoClickers;i++) GAME.autoClickerTimers.push({busy:false, remaining:0, end:0});
-    }catch(e){ console.warn('Failed to parse save', e); }
-  }
-  updateUI();
+  if (!s) return;
+  try {
+    const d = JSON.parse(s);
+    GAME.money               = d.money               ?? GAME.money;
+    GAME.baseIncome          = d.baseIncome           ?? GAME.baseIncome;
+    GAME.incomeBoosts        = d.incomeBoosts         ?? GAME.incomeBoosts;
+    GAME.incomeAmuletActive  = d.incomeAmuletActive   ?? GAME.incomeAmuletActive;
+    GAME.sellMultiplier      = d.sellMultiplier       ?? GAME.sellMultiplier;
+    GAME.autoSell            = d.autoSell             ?? GAME.autoSell;
+    GAME.permanentLuckStones = d.permanentLuckStones  ?? GAME.permanentLuckStones;
+    GAME.sellersCrowns       = d.sellersCrowns        ?? GAME.sellersCrowns;
+    GAME.inventory           = d.inventory            ?? GAME.inventory;
+    GAME.autoClickers        = d.autoClickers         ?? GAME.autoClickers;
+    GAME.rollDuration        = d.rollDuration         ?? GAME.rollDuration;
+    GAME.speedUpgradeLevel   = d.speedUpgradeLevel    ?? GAME.speedUpgradeLevel;
+    GAME.theme               = d.theme                ?? 'default';
+    GAME.rainIntensity       = d.rainIntensity        ?? 5;
+    GAME.autoClickerTimers   = [];
+    for (let i = 0; i < GAME.autoClickers; i++) GAME.autoClickerTimers.push({ busy: false, end: 0 });
+  } catch(e) { console.warn('Failed to parse save', e); }
 }
 
-function exportSave(){
-  const save = localStorage.getItem(SAVE_KEY) || JSON.stringify({
-    money: GAME.money,
-    baseIncome: GAME.baseIncome,
-    incomeBoosts: GAME.incomeBoosts,
-    incomeAmuletActive: GAME.incomeAmuletActive,
-    sellMultiplier: GAME.sellMultiplier,
-    autoSell: GAME.autoSell,
-    luckPercent: GAME.luckPercent,
-    permanentLuckStones: GAME.permanentLuckStones,
-    sellersCrowns: GAME.sellersCrowns,
-    inventory: GAME.inventory,
-    autoClickers: GAME.autoClickers,
-    rollDuration: GAME.rollDuration,
-    speedUpgradeLevel: GAME.speedUpgradeLevel,
-    theme: GAME.theme,
-    rainIntensity: GAME.rainIntensity
-  });
-  const blob = new Blob([save], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'idle_gacha_save.json';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+function exportSave() {
+  const blob = new Blob([JSON.stringify(buildSaveObject(), null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'idle_gacha_save.json';
+  document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
-  log('Exported save.');
+  log('Save exported.');
 }
 
-function importSave(event){
-  const file = event.target.files && event.target.files[0];
-  if(!file) return;
+function importSave(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e){
-    try{
-      const data = JSON.parse(e.target.result);
-      if(typeof data !== 'object'){ throw new Error('Invalid save'); }
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (typeof data !== 'object' || data === null) throw new Error('bad save');
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-      document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(data))}; path=/; max-age=${60*60*24*365}`;
       loadGame();
-      log('Imported save.');
-    }catch(err){
-      log('Failed to import save: invalid file.');
+      loadTheme();
+      loadRainIntensity();
+      updateUI();
+      log('Save imported.', 'good');
+    } catch(err) {
+      log('Import failed — invalid file.', 'error');
       console.warn(err);
     }
   };
   reader.readAsText(file);
-  event.target.value = '';
+  e.target.value = '';
 }
 
-function clearAllData(){
-  if(!confirm('Clear all saved data?')) return;
-  try{
-    localStorage.removeItem(SAVE_KEY);
-    document.cookie = `${COOKIE_NAME}=; path=/; max-age=0`;
-    for(const k of Object.keys(localStorage)){
-      if(k.startsWith('idleGacha')) localStorage.removeItem(k);
-    }
-  }catch(e){ console.warn('Error clearing data', e); }
-  log('All local data cleared.');
-  setTimeout(()=>{ location.reload(); }, 500);
+function clearAllData() {
+  if (!confirm('Clear all saved data and restart?')) return;
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('idleGacha'));
+    keys.forEach(k => localStorage.removeItem(k));
+  } catch(e) { console.warn('Error clearing data', e); }
+  setTimeout(() => location.reload(), 300);
 }
 
-/* ---------- Inventory collapsible UI ---------- */
-function toggleRarityGroup(rarityKey){
+function toggleRarityGroup(rarityKey) {
   GAME.expandedRarities[rarityKey] = !GAME.expandedRarities[rarityKey];
   updateUI();
 }
 
-/* ---------- UI update ---------- */
-function updateUI(){
+function updateUI() {
   UI.money.textContent = formatMoney(GAME.money);
-  const base = GAME.baseIncome + GAME.incomeBoosts;
-  const itemsIncome = calculateItemIncome();
-  let totalIncome = base + itemsIncome;
-  
-  if(GAME.incomeAmuletActive){
-    totalIncome = totalIncome * 2;
-  }
-  
-  const totalIncomeStr = totalIncome.toFixed(2);
-  UI.income.textContent = `$${totalIncomeStr} / sec`;
-  document.getElementById('inventoryIncome').textContent = `Item income: $${itemsIncome.toFixed(2)} / sec`;
-  
-  const totalLuck = GAME.luckPercent + (GAME.permanentLuckStones * 5);
-  UI.luck.textContent = `${totalLuck}%`;
-  
-  // Update permanent items display
+
+  const base  = GAME.baseIncome + GAME.incomeBoosts;
+  const items = calculateItemIncome();
+  const total = (base + items) * (GAME.incomeAmuletActive ? 2 : 1);
+  UI.income.textContent        = '$' + total.toFixed(2) + ' / sec';
+  UI.inventoryIncome.textContent = 'Item income: $' + items.toFixed(2) + ' / sec';
+
+  const totalLuck = GAME.luckPercent + GAME.permanentLuckStones * 5;
+  UI.luckDisplay.textContent = totalLuck + '%' + (GAME.luckPercent > 0 ? ' 🧪' : '');
+
   UI.permItems.innerHTML = '';
-  if(GAME.permanentLuckStones > 0){
-    const div = document.createElement('div');
-    div.className = 'perm-item';
-    div.innerHTML = `💎 Luck Stone ×${GAME.permanentLuckStones} (+${GAME.permanentLuckStones*5}%)`;
-    UI.permItems.appendChild(div);
-  }
-  if(GAME.incomeAmuletActive){
-    const div = document.createElement('div');
-    div.className = 'perm-item';
-    div.innerHTML = `✨ Income Amulet (×2)`;
-    UI.permItems.appendChild(div);
-  }
-  if(GAME.sellersCrowns > 0){
-    const div = document.createElement('div');
-    div.className = 'perm-item';
-    div.innerHTML = `👑 Seller's Crown ×${GAME.sellersCrowns} (+${(GAME.sellersCrowns*20)}%)`;
-    UI.permItems.appendChild(div);
-  }
-  
-  // Build collapsible inventory by rarity
-  UI.inventory.innerHTML = '';
-  for(const r of RARITIES){
-    const count = GAME.inventory[r.key] || 0;
-    if(count > 0){
-      const totalIncome = count * (r.income || 0);
-      const expanded = GAME.expandedRarities[r.key] || false;
-      
-      const group = document.createElement('div');
-      group.className = 'rarity-group';
-      
-      const header = document.createElement('div');
-      header.className = `rarity-header ${expanded ? 'expanded' : ''}`;
-      header.onclick = () => toggleRarityGroup(r.key);
-      header.innerHTML = `
-        <div>
-          <span class="rarity-tag ${r.color}">${r.key}</span>
-          <strong style="margin-left:8px">×${count}</strong>
-          <span class="small" style="margin-left:8px">${formatMoney(totalIncome)}/s</span>
-        </div>
-        <span class="rarity-toggle">${expanded ? '▼' : '▶'}</span>
-      `;
-      
-      const itemsContainer = document.createElement('div');
-      itemsContainer.className = `rarity-items ${expanded ? 'shown' : ''}`;
-      
-      if(expanded){
-        const variants = MATERIAL_VARIANTS[r.key];
-        const itemsHtml = `
-          <div style="display:flex;justify-content:space-between;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.02)">
-            <div><strong>${r.itemPrefix} variants</strong></div>
-            <div style="display:flex;gap:4px">
-              <button class="btn secondary" onclick="sellOne('${r.key}')" style="padding:4px 8px;font-size:10px">Sell 1</button>
-              <button class="btn secondary" onclick="sellAllRarity('${r.key}')" style="padding:4px 8px;font-size:10px">Sell All</button>
-            </div>
-          </div>
-          <div style="font-size:11px;color:var(--muted)">
-            Base sell: <strong>${formatMoney(r.sell)}</strong> | Income: <strong>$${(r.income || 0).toFixed(2)}/s each</strong>
-          </div>
-        `;
-        itemsContainer.innerHTML = itemsHtml;
-      }
-      
-      group.appendChild(header);
-      group.appendChild(itemsContainer);
-      UI.inventory.appendChild(group);
+  const hasPerms = GAME.permanentLuckStones || GAME.incomeAmuletActive || GAME.sellersCrowns;
+  if (!hasPerms) {
+    UI.permItems.innerHTML = '<span class="small" style="color:var(--muted);font-style:italic">None yet</span>';
+  } else {
+    if (GAME.permanentLuckStones > 0) {
+      const d = document.createElement('div'); d.className = 'perm-item';
+      d.textContent = '💎 Luck Stone ×' + GAME.permanentLuckStones + ' (+' + GAME.permanentLuckStones * 5 + '%)';
+      UI.permItems.appendChild(d);
+    }
+    if (GAME.incomeAmuletActive) {
+      const d = document.createElement('div'); d.className = 'perm-item';
+      d.textContent = '✨ Income Amulet (×2)';
+      UI.permItems.appendChild(d);
+    }
+    if (GAME.sellersCrowns > 0) {
+      const d = document.createElement('div'); d.className = 'perm-item';
+      d.textContent = "👑 Seller's Crown ×" + GAME.sellersCrowns + ' (+' + GAME.sellersCrowns * 20 + '%)';
+      UI.permItems.appendChild(d);
     }
   }
-  
-  UI.autoClickerCount.textContent = GAME.autoClickers;
-  UI.autoClickerPrice.textContent = formatMoney(Math.ceil(getAutoClickerPrice()));
-  UI.speedUpgradePrice.textContent = formatMoney(Math.ceil(getSpeedUpgradePrice()));
-  UI.rollDurationLabel.textContent = `${GAME.rollDuration.toFixed(1)}s`;
-  UI.rollDurationDisplay.textContent = `${GAME.rollDuration.toFixed(1)}s`;
+
+  UI.inventory.innerHTML = '';
+  let hasItems = false;
+  for (const r of RARITIES) {
+    const count = GAME.inventory[r.key] || 0;
+    if (count <= 0) continue;
+    hasItems = true;
+    const iIncome  = count * r.income;
+    const expanded = !!GAME.expandedRarities[r.key];
+
+    const group  = document.createElement('div');
+    group.className = 'rarity-group';
+
+    const header = document.createElement('div');
+    header.className = 'rarity-header' + (expanded ? ' expanded' : '');
+    header.onclick   = () => toggleRarityGroup(r.key);
+    header.innerHTML =
+      '<div style="display:flex;align-items:center;gap:8px">' +
+        '<span class="rarity-tag ' + r.color + '">' + r.key + '</span>' +
+        '<strong>×' + count + '</strong>' +
+        '<span class="small">$' + iIncome.toFixed(2) + '/s</span>' +
+      '</div>' +
+      '<span class="rarity-toggle">' + (expanded ? '▼' : '▶') + '</span>';
+
+    const body = document.createElement('div');
+    body.className = 'rarity-items' + (expanded ? ' shown' : '');
+    if (expanded) {
+      body.innerHTML =
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+          '<span style="font-size:12px;color:var(--muted)">Sell: <strong style="color:#e6eef6">' + formatMoney(r.sell) + '</strong> · income: <strong style="color:#e6eef6">$' + r.income.toFixed(2) + '/s each</strong></span>' +
+          '<div style="display:flex;gap:4px">' +
+            '<button class="btn secondary" onclick="sellOne(\'' + r.key + '\')" style="padding:4px 8px;font-size:11px">Sell 1</button>' +
+            '<button class="btn secondary" onclick="sellAllRarity(\'' + r.key + '\')" style="padding:4px 8px;font-size:11px">Sell All</button>' +
+          '</div>' +
+        '</div>';
+    }
+
+    group.appendChild(header);
+    group.appendChild(body);
+    UI.inventory.appendChild(group);
+  }
+  if (!hasItems) {
+    UI.inventory.innerHTML = '<div class="small" style="color:var(--muted);font-style:italic;padding:6px">No items yet — go roll!</div>';
+  }
+
+  UI.autoClickerCount.textContent    = GAME.autoClickers;
+  UI.autoClickerPrice.textContent    = formatMoney(Math.ceil(getAutoClickerPrice()));
+  UI.speedUpgradePrice.textContent   = formatMoney(Math.ceil(getSpeedUpgradePrice()));
+  UI.rollDurationLabel.textContent   = GAME.rollDuration.toFixed(1) + 's';
+  UI.rollDurationDisplay.textContent = GAME.rollDuration.toFixed(1) + 's';
+  UI.autoSellBtn.textContent = GAME.autoSell ? '✓ Active' : 'Buy';
+  UI.amuletBtn.textContent   = GAME.incomeAmuletActive ? '✓ Owned' : 'Buy';
 }
 
-/* ---------- Bind events ---------- */
-UI.manualRollBtn.addEventListener('click', ()=>{
-  if(manualRollState.busy) { log('Manual roll already in progress.'); return; }
-  if(GAME.money < GAME.rollCost){ log('Not enough money to roll.'); return; }
-  startRoll('manual');
+UI.manualRollBtn.addEventListener('click', () => {
+  if (manualRollState.busy)           { log('Roll already in progress.', 'warn'); return; }
+  if (GAME.money < GAME.rollCost)     { log('Not enough money to roll.', 'warn'); return; }
+  startRoll('manual', null);
 });
-document.getElementById('fileImport').addEventListener('change', importSave);
 
-/* ---------- Start ---------- */
+UI.fileImport.addEventListener('change', importSave);
+
 loadTheme();
 loadRainIntensity();
 loadGame();
 updateUI();
-log('Game ready. Enjoy!');
+log('Game ready. Enjoy! 🎲', 'good');
 
-setTimeout(() => {
-  log('Running final bug test (50,000 rolls)...');
-  const trials = 50000;
-  const counts = {};
-  for(const r of RARITIES) counts[r.key] = 0;
-  for(let i=0;i<trials;i++){
-    const res = weightedRarityRoll(0);
-    counts[res.key]++;
+(function distributionTest() {
+  const trials = 50000, counts = {};
+  RARITIES.forEach(r => counts[r.key] = 0);
+  for (let i = 0; i < trials; i++) counts[weightedRarityRoll(0).key]++;
+  const totalW = RARITIES.reduce((a, b) => a + b.weight, 0);
+  let ok = true;
+  for (const r of RARITIES) {
+    const expected = (r.weight / totalW) * 100;
+    const actual   = (counts[r.key]  / trials) * 100;
+    if (Math.abs(actual - expected) >= 1.5) ok = false;
   }
-  console.log(`=== BUG TEST: ${trials} rolls ===`);
   console.table(counts);
-  const totalWeight = RARITIES.reduce((a,b)=>a+b.weight,0);
-  let allGood = true;
-  for(const r of RARITIES){
-    const expected = (r.weight/totalWeight)*100;
-    const actual = (counts[r.key]/trials)*100;
-    const variance = Math.abs(actual-expected);
-    console.log(`${r.key}: ${actual.toFixed(2)}% (expected ${expected.toFixed(2)}%, variance ${variance.toFixed(2)}%)`);
-    if(variance >= 1.5) allGood = false;
-  }
-  log(`✅ Bug test complete: ${allGood ? 'All distributions normal' : 'Some variance detected'}`);
-}, 120000);
+  log('Roll distribution: ' + (ok ? '✅ Normal' : '⚠️ Variance — check console'), ok ? 'good' : 'warn');
+})();
 </script>
 </body>
 </html>
